@@ -1,0 +1,15 @@
+<resources>
+    <!-- Splash screen theme used ONLY at startup -->
+    <style name="BootTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/bootsplash_logo</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:statusBarColor">#FFFFFF</item> <!-- Set status bar background color -->
+    <item name="android:windowLightStatusBar">true</item>
+        
+    </style>
+
+    <!-- App main theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
+

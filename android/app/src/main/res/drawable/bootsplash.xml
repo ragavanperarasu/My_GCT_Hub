@@ -1,0 +1,10 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/bootsplash_background" />
+
+    <item>
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/bootsplash_logo"
+            android:scaleType="fitXY" />
+    </item>
+</layer-list>
