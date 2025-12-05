@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {Alert, BackHandler, Platform} from 'react-native';
+import {Alert, BackHandler, Platform, TouchableOpacity} from 'react-native';
 
 import {
   Dialog,
@@ -10,6 +10,7 @@ import {
 } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import {RootStackParamList} from './screens/RootParam';
 
 import StudentHome from './screens/StudentHome';
@@ -44,19 +45,22 @@ import Attcreate from './screens/StudentBottomNav/Attcreate';
 import Insertatt from './screens/StudentBottomNav/Insertatt';
 import Attview from './screens/StudentBottomNav/Attview';
 
+import CameraScreen from './screens/CameraScreen';
+
 import notifee, { AuthorizationStatus, AndroidImportance } from '@notifee/react-native';
 import Immersive from 'react-native-immersive';
 import Pinenter from './screens/StudentBottomNav/Pinenter';
 
 
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
 
 
 const isAndroid15 = Platform.OS === 'android' && Platform.Version >= 35;
 
 function App() {
 const [exitVisible, setExitVisible] = useState(false);
-
 
 
 async function setupNotifications() {
@@ -71,17 +75,6 @@ async function setupNotifications() {
 
     if (settings.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
       setExitVisible(true)
-      // Alert.alert(
-      //   'Notification Permission',
-      //   'Kindly enable notifications to receive important news, updates, and posts from the app.',
-      //   [
-      //     {
-      //       text: 'Go to Settings',
-      //       onPress: () => notifee.openNotificationSettings(),
-      //     },
-      //     { text: 'Cancel', style: 'cancel', onPress: () => BackHandler.exitApp()},
-      //   ]
-      // );
       return; 
     }
   }
@@ -100,7 +93,7 @@ useEffect(() => {
 
     return () => {
       if (isAndroid15) {
-        Immersive.off();
+         Immersive.off();
       }
     };
   }, []);
@@ -149,9 +142,20 @@ useEffect(() => {
 
       <Stack.Screen name="Dir" component={Dir} options={{ headerShown: false }}/>
       <Stack.Screen name="StudentHome" component={StudentHome} options={{ headerShown: false }}/>
-      <Stack.Screen name="SubShow" component={SubShow} options={{ headerShown: false }}/>
+      <Stack.Screen name="SubShow" component={SubShow}  options={({ navigation }) => ({
+    title: "Semester Questions",
+    headerTitleAlign: 'center',
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#1560BD',
+      fontFamily: 'Momo Trust Display',
+    },
+    headerBackTitleVisible: false,
+    headerTintColor: '#1560BD',
+    
+  })}/>
       <Stack.Screen name="BooksShow" component={BooksShow} options={{ headerShown: false }}/>
-      <Stack.Screen name="About" component={About} options={{ headerShown: false }}/>
+      <Stack.Screen name="About" component={About} options={{ headerShown: true }}/>
       <Stack.Screen name="WebViewShow" component={WebViewShow} options={{ headerShown: false }}/>
       <Stack.Screen name="WebViewSave" component={WebViewSave} options={{ headerShown: false }}/>
       <Stack.Screen name="UtSubShow" component={UtSubShow} options={{ headerShown: false }}/>
@@ -164,7 +168,18 @@ useEffect(() => {
       <Stack.Screen name="UserLogin" component={UserLogin} options={{ headerShown: false }}/>
       <Stack.Screen name="CreateNewAccount" component={CreateNewAccount} options={{ headerShown: false }}/>
 
-      <Stack.Screen name="UploadSemqus" component={UploadSemqus} options={{ headerShown: false }}/>
+      <Stack.Screen name="UploadSemqus" component={UploadSemqus} options={({ navigation }) => ({
+    title: "New Post",
+    headerTitleAlign: 'center',
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#1560BD',
+      fontFamily: 'Momo Trust Display',
+    },
+    headerBackTitleVisible: false,
+    headerTintColor: '#1560BD',
+    
+  })}/>
       <Stack.Screen name="UploadUtoqus" component={UploadUtoqus} options={{ headerShown: false }}/>
       <Stack.Screen name="UploadUttqus" component={UploadUttqus} options={{ headerShown: false }}/>
       <Stack.Screen name="UploadBooks" component={UploadBooks} options={{ headerShown: false }}/>
@@ -180,6 +195,8 @@ useEffect(() => {
       <Stack.Screen name="Insertatt" component={Insertatt} options={{ headerShown: false }}/>
       <Stack.Screen name="Attview" component={Attview} options={{ headerShown: false }}/>
       <Stack.Screen name="Pinenter" component={Pinenter} options={{ headerShown: false }}/>
+
+      <Stack.Screen name="CameraScreen" component={CameraScreen} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer></PaperProvider>
   );

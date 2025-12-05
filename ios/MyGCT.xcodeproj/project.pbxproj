@@ -13,6 +13,10 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		53AB7EC059B54A93B8D9D5F4 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05E3527A800F4ED38CE175C8 /* BootSplash.storyboard */; };
 		DCFDBED49F77446F81490BA4 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B36F7F964E14D7685B5208B /* Colors.xcassets */; };
+		F8CC4E3CBAA8455E800C1795 /* DM Serif Text.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 55F4A26C0EC94700B36BCE72 /* DM Serif Text.ttf */; };
+		757BB7425D01415CA4E5361C /* Space Mono.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5B24B7C33A742DA8E1B40D0 /* Space Mono.ttf */; };
+		4A108F8001824C4D9D6D88FE /* Momo Trust Display.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 20A63D50FC6D49C5A8FF5A38 /* Momo Trust Display.ttf */; };
+		A95DD273C6814F1EBF243AC3 /* Philosopher.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 452035936B5E4C719BBA4106 /* Philosopher.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +43,10 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		05E3527A800F4ED38CE175C8 /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "MyGCT/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		8B36F7F964E14D7685B5208B /* Colors.xcassets */ = {isa = PBXFileReference; name = "Colors.xcassets"; path = "MyGCT/Colors.xcassets"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = folder.assetcatalog; explicitFileType = undefined; includeInIndex = 0; };
+		55F4A26C0EC94700B36BCE72 /* DM Serif Text.ttf */ = {isa = PBXFileReference; name = "DM Serif Text.ttf"; path = "../assets/fonts/DM Serif Text.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A5B24B7C33A742DA8E1B40D0 /* Space Mono.ttf */ = {isa = PBXFileReference; name = "Space Mono.ttf"; path = "../assets/fonts/Space Mono.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		20A63D50FC6D49C5A8FF5A38 /* Momo Trust Display.ttf */ = {isa = PBXFileReference; name = "Momo Trust Display.ttf"; path = "../assets/fonts/Momo Trust Display.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		452035936B5E4C719BBA4106 /* Philosopher.ttf */ = {isa = PBXFileReference; name = "Philosopher.ttf"; path = "../assets/fonts/Philosopher.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +107,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				B4FD11ADAEAB454F805442E6 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -121,6 +130,18 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		B4FD11ADAEAB454F805442E6 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				55F4A26C0EC94700B36BCE72 /* DM Serif Text.ttf */,
+				A5B24B7C33A742DA8E1B40D0 /* Space Mono.ttf */,
+				20A63D50FC6D49C5A8FF5A38 /* Momo Trust Display.ttf */,
+				452035936B5E4C719BBA4106 /* Philosopher.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -193,6 +214,10 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				53AB7EC059B54A93B8D9D5F4 /* BootSplash.storyboard in Resources */,
 				DCFDBED49F77446F81490BA4 /* Colors.xcassets in Resources */,
+				F8CC4E3CBAA8455E800C1795 /* DM Serif Text.ttf in Resources */,
+				757BB7425D01415CA4E5361C /* Space Mono.ttf in Resources */,
+				4A108F8001824C4D9D6D88FE /* Momo Trust Display.ttf in Resources */,
+				A95DD273C6814F1EBF243AC3 /* Philosopher.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

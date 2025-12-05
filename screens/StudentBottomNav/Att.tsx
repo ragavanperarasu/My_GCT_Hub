@@ -24,6 +24,7 @@ import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Cache} from 'react-native-cache';
 import Loading from '../components/Loading';
+import * as Animatable from 'react-native-animatable';
 
 const cache = new Cache({
   namespace: 'mygct',
@@ -176,7 +177,8 @@ const loadCache = async () => {
           {rdata &&
             rdata.length > 0 &&
             rdata.map((d, ind) => (
-              <View key={ind} style={styles.section}>
+              <Animatable.View key={ind} style={styles.section} animation={'zoomIn'}
+      duration={1500} useNativeDriver>
                 <View style={styles.iconRow}>
                   <View style={styles.profileIcon}>
                     <Nodejs width={60} height={53} />
@@ -267,7 +269,7 @@ const loadCache = async () => {
                     <Text style={styles.likeText}>Delete</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </Animatable.View>
             ))}
         </ScrollView>
 

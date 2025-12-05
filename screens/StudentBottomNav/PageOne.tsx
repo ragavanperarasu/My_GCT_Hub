@@ -1,25 +1,14 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  ToastAndroid, Vibration
+  ToastAndroid, Vibration, Button
 } from 'react-native';
-import {Dialog, Portal, Button, Text, Icon} from 'react-native-paper';
+import {Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import StudentTitle from './../TileBar/StudentTitle';
-import Logo from '../../assets/images/ti.svg';
-import Note from '../../assets/images/note.svg';
-
-import Books from '../../assets/images/books.svg';
-import Ut from '../../assets/images/ut.svg';
-import Sem from '../../assets/images/sem.svg';
-import Syl from '../../assets/images/syl.svg';
-import Alu from '../../assets/images/alu.svg';
-import Hello from '../../assets/images/hello.svg';
-import Edit from '../../assets/images/edit.svg';
-import Food from '../../assets/images/food.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Cache} from 'react-native-cache';
 import Search from '../Search';
@@ -33,9 +22,14 @@ import RegulationDialog from '../components/RegulationDialog';
 
 import useNetworkStatus from '../functions/useNetworkStatus';
 
+import * as Animatable from 'react-native-animatable';
+
+import RBSheet from "react-native-raw-bottom-sheet";
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/Feather';
+
+import HeaderLogo from '../components/HeaderLogo';
 
 const cache = new Cache({
   namespace: 'mygct',
@@ -46,9 +40,15 @@ const cache = new Cache({
   backend: AsyncStorage,
 });
 
+
+
 export default function PageOne() {
   const navigation = useNavigation();
   const netc = useNetworkStatus();
+
+  const refRBSheet = useRef();
+  const refRBExit = useRef();
+  const refSemesterSheet = useRef();
 
   const [visible1, setVisible1] = React.useState(false);
   const [visible2, setVisible2] = React.useState(false);
@@ -109,19 +109,17 @@ export default function PageOne() {
       }
     };
     loadCache();
-  }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      BootSplash.hide({fade: true});
-    }, 500);
-    return () => clearTimeout(timer);
+          setTimeout(() => {
+  BootSplash.hide({ fade: true });
+}, 200);
+    
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        setExitVisible(true);
+        refRBExit.current.open();
         return true;
       };
 
@@ -148,16 +146,102 @@ export default function PageOne() {
 
   return (
     <View
+    
       style={{
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#ffffffff',
         height: '100%',
         paddingHorizontal: 5,
       }}>
-      <Portal>
+        <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
+
+<RBSheet
+  ref={refRBExit}
+  closeOnDragDown
+  closeOnPressMask
+  height={230}
+  customStyles={{
+    container: {
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      alignItems: 'center',
+    },
+  }}
+>
+  <HeaderLogo />
+
+  <Text
+    style={{
+      fontSize: 18,
+      color: 'black',
+      textAlign: 'center',
+      marginTop: 20,
+      fontFamily: 'Philosopher',
+    }}
+  >
+    Are you sure you want to exit?
+  </Text>
+
+  <View
+    style={{
+      flexDirection: 'row',
+      marginTop: 30,
+      gap: 15,
+    }}
+  >
+    {/* Cancel Button */}
+    <TouchableOpacity
+      onPress={() => refRBExit.current.close()}
+      style={{
+        flex: 1,
+        backgroundColor: '#3EB489',
+        paddingVertical: 12,
+        borderRadius: 10,
+        alignItems: 'center',
+      }}
+    >
+      <Text
+        style={{
+          color: 'white',
+          fontSize: 18,
+          fontFamily: 'Philosopher',
+        }}
+      >
+        Cancel
+      </Text>
+    </TouchableOpacity>
+
+    {/* Exit Button */}
+    <TouchableOpacity
+      onPress={() => BackHandler.exitApp()}
+      style={{
+        flex: 1,
+        backgroundColor: '#CD5C5C',
+        paddingVertical: 12,
+        borderRadius: 10,
+        alignItems: 'center',
+      }}
+    >
+      <Text
+        style={{
+          color: 'white',
+          fontSize: 18,
+          fontFamily: 'Philosopher',
+        }}
+      >
+        Exit
+      </Text>
+    </TouchableOpacity>
+  </View>
+</RBSheet>
+
+
+
+      {/* <Portal>
         <Dialog
           visible={exitVisible}
           onDismiss={() => setExitVisible(false)}
-          style={{backgroundColor: '#F7F7F7'}}>
+          style={{backgroundColor: '#ffffffff'}}>
           <Dialog.Content>
             <Text
               variant="bodyMedium"
@@ -180,92 +264,374 @@ export default function PageOne() {
             </Button>
           </Dialog.Actions>
         </Dialog>
-      </Portal>
+      </Portal> */}
 
-      <DepartmentDialog
+      {/* <DepartmentDialog
         visible={visible1}
         onClose={handleClose}
         onSelect={handleSelect}
-      />
+      /> */}
 
-      <SemesterDialog
+      <RBSheet
+  ref={refSemesterSheet}
+  height={350}
+  openDuration={400}
+  closeOnDragDown={true}
+  customStyles={{
+    container: {
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+    },
+  }}
+>
+  <SemesterDialog
+    onSelect={(sem) => {
+      handleSelect2(sem);
+      refSemesterSheet.current.close();
+    }}
+  />
+</RBSheet>
+
+
+      {/* <SemesterDialog
         visible={visible2}
         onDismiss={handleClose2}
         semSelect={handleSelect2}
-      />
+      /> */}
+
+      <RBSheet
+        ref={refRBSheet}
+        height={400}
+        openDuration={400}
+        closeOnDragDown={true}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          },
+        }}
+      >
+        <DepartmentDialog
+          onSelect={handleSelect}
+          onClose={() => refRBSheet.current.close()}
+        />
+      </RBSheet>
 
       <RegulationDialog visible={visible3} onDismiss={handleClose3} />
 
       <ScrollView
         style={{backgroundColor: '#FFFFFF'}}
         keyboardShouldPersistTaps="handled">
-        <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
+        
 
         <StudentTitle />
 
-        <View style={{marginBottom: 10}}>
-          <Text
-            style={{
-              color: 'black',
-              marginLeft: 10,
-              fontSize: 20,
-              fontWeight: '800',
-              fontFamily: 'monospace',
-            }}>
-            Welcome{<Hello width={20} height={20} />}, {userdata.name}
-          </Text>
-          <TouchableOpacity onPress={() => setVisible1(true)}>
-            <Text
-              style={{
-                color: 'black',
-                marginLeft: 10,
-                fontSize: 16,
-                fontWeight: '600',
-                marginTop: 20,
-              }}>
-              {tempdept}{' '}
-              {
-                <Icon source="playlist-edit" color="#856088" size={25} />
-                // <Edit width={20} height={17} />
-              }
-            </Text>
-          </TouchableOpacity>
+        <Animatable.View animation={'zoomIn'}
+      duration={1000} delay={300} useNativeDriver  style={{marginBottom: 10}} >
 
-          <TouchableOpacity onPress={() => setVisible2(true)}>
+<TouchableOpacity onPress={() => refRBSheet.current.open()}>
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#E6E6FA',
+      marginHorizontal: 5,
+      padding: 8,
+      borderRadius: 10,
+      alignSelf: 'flex-start',
+    }}
+  >
+  <FontAwesome name="bookmark" color="#4B0082" size={18} />
+    {/* <Icon source="playlist-edit" color="#856088" size={25} /> */}
+    <Text
+      style={{
+        color: '#4B0082',
+        marginLeft: 6,
+        fontSize: 15,
+        fontFamily: 'Philosopher',
+      }}
+    >
+      {tempdept}
+    </Text>
+
+    
+  </View>
+</TouchableOpacity>
+
+
+          <TouchableOpacity onPress={() => refSemesterSheet.current.open()}>
+            <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FFF0F5',
+      marginTop: 10,
+      marginHorizontal: 5,
+      padding: 8,
+      borderRadius: 10,
+      alignSelf: 'flex-start',
+    }}
+  ><FontAwesome name="grid" color="#DE3163" size={18} />
             <Text
               style={{
-                color: 'black',
-                marginLeft: 10,
-                fontSize: 16,
-                fontWeight: '600',
-                marginTop: 18,
+                color: '#DE3163',
+                marginLeft: 6,
+                fontSize: 15,
+                fontFamily: 'Philosopher',
               }}>
+                
               {tempsem}
-              {'  '}
-              {<Icon source="playlist-edit" color="#856088" size={25} />}
-            </Text>
+            </Text></View>
           </TouchableOpacity>
-          {/* {' '}
-            - R{tempreg}
-            {'  '} */}
-          {/* {
-              <TouchableOpacity onPress={() => setVisible3(true)}>
-                <Icon source="playlist-edit" color="#856088" size={25} />
-              </TouchableOpacity>
-            } */}
-        </View>
+        </Animatable.View>
 
         <Search />
 
-        <Text style={styles.subtitle}> Learning Resource </Text>
+        {/* <Animatable.Text animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver  style={styles.subtitle}> Learning Resource </Animatable.Text> */}
 
-        <View style={styles.v1}>
+
+
+
+<Animatable.View
+  animation={'zoomIn'}
+  duration={1000}
+  delay={500}
+  useNativeDriver
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+
+  }}
+>
+
+  {/* BOX 1 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#E0FFFF',
+      borderRadius: 15,
+      paddingVertical: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <MaterialCommunityIcons name="timetable" color="#007BA7" size={31} />
+    <Text style={{ color: '#007BA7', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
+      Time Table
+    </Text>
+  </TouchableOpacity>
+
+  {/* BOX 2 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#D0F0C0',
+      paddingVertical: 10,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <MaterialCommunityIcons name="notebook-edit-outline" color="#2E8B57" size={31} />
+    <Text style={{ color: '#2E8B57', fontFamily: 'Philosopher', marginTop: 5, fontSize:15 }}>
+      Notes
+    </Text>
+  </TouchableOpacity>
+
+</Animatable.View>
+
+
+
+
+
+<Animatable.View
+  animation={'zoomIn'}
+  duration={1000}
+  delay={600}
+  useNativeDriver
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+
+  }}
+>
+
+  {/* BOX 1 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#EFDCFF',
+      paddingVertical: 10,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+
+    onPress={() => {
+              if (!netc) {
+                navigation.navigate('SubShow', somedata);
+              } else {
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
+                Vibration.vibrate(100);
+              }
+            }}
+  >
+    <MaterialCommunityIcons name="clipboard-edit-outline" color="#6F2DA8" size={31} />
+    <Text style={{ color: '#6F2DA8', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
+      Sem Exam
+    </Text>
+  </TouchableOpacity>
+
+  {/* BOX 2 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#F7E7CE',
+      paddingVertical: 10,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <MaterialCommunityIcons name="book-education-outline" color="#FF7F50" size={31} />
+    <Text style={{ color: '#FF7F50', fontFamily: 'Philosopher', marginTop: 5, fontSize:15 }}>
+      Syllabus
+    </Text>
+  </TouchableOpacity>
+
+</Animatable.View>
+
+
+
+
+
+<Animatable.View
+  animation={'zoomIn'}
+  duration={1000}
+  delay={700}
+  useNativeDriver
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+
+  }}
+>
+
+  {/* BOX 1 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#E5E4E2',
+      paddingVertical: 10,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <MaterialCommunityIcons name="bookshelf" color="#4D5D53" size={31} />
+    <Text style={{ color: '#4D5D53', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
+      Books
+    </Text>
+  </TouchableOpacity>
+
+
+
+</Animatable.View>
+
+
+
+
+
+<Animatable.View
+  animation={'zoomIn'}
+  duration={1000}
+  delay={700}
+  useNativeDriver
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+
+  }}
+>
+
+  {/* BOX 1 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#F3EBF3',
+      paddingVertical: 10,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <MaterialCommunityIcons name="clipboard-list-outline" color="#8d4b89ff" size={31} />
+    <Text style={{ color: '#8d4b89ff', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
+      Unit Test 1
+    </Text>
+  </TouchableOpacity>
+
+  {/* BOX 2 */}
+  <TouchableOpacity
+    style={{
+      flex: 1,
+      marginHorizontal: 5,
+      backgroundColor: '#FFE2DE',
+      paddingVertical: 10,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <MaterialCommunityIcons name="clipboard-list-outline" color="#8A3324" size={31} />
+    <Text style={{ color: '#8A3324', fontFamily: 'Philosopher', marginTop: 5, fontSize:15 }}>
+      Unit Test 2
+    </Text>
+  </TouchableOpacity>
+
+</Animatable.View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/* 
+        <Animatable.View style={styles.v1} animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver>
           <TouchableOpacity
             onPress={() => {
               if (!netc) {
                 navigation.navigate('TimetableShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -275,65 +641,7 @@ export default function PageOne() {
             <Text style={[styles.semst, {marginLeft: -15}]}>Time Table</Text>
           </TouchableOpacity>
 
-          {/* <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons
-              name="timetable"
-              color="#007FFF"
-              size={34}
-            />
-
-            <Text style={{color: 'black'}}>Time Table</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons
-              name="notebook-edit-outline"
-              color="#007FFF"
-              size={34}
-            />
-
-            <Text style={{color: 'black'}}>Notes</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons
-              name="book-edit"
-              color="#007FFF"
-              size={34}
-            />
-
-            <Text style={{color: 'black'}}>Semester</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialIcons name="rule" color="#007FFF" size={34} />
-
-            <Text style={{color: 'black'}}>Syllabus</Text>
-          </TouchableOpacity> */}
+          
 
           
 
@@ -342,7 +650,7 @@ export default function PageOne() {
               if (!netc) {
                 navigation.navigate('StuNoteShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -351,15 +659,16 @@ export default function PageOne() {
 
             <Text style={[styles.semst, {marginLeft: -35}]}>Notes</Text>
           </TouchableOpacity> 
-        </View>
+        </Animatable.View>
 
-        <View style={styles.v1}>
+        <Animatable.View style={styles.v1} animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver>
           <TouchableOpacity
             onPress={() => {
               if (!netc) {
                 navigation.navigate('SubShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -374,7 +683,7 @@ export default function PageOne() {
               if (!netc) {
                 navigation.navigate('SyllShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -383,78 +692,21 @@ export default function PageOne() {
 
             <Text style={[styles.semst, {marginLeft: -20}]}>Syllabus</Text>
           </TouchableOpacity>
-        </View>
+        </Animatable.View>
 
-        <Text style={styles.subtitle}> Study Materials </Text>
+        <Animatable.Text animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver style={styles.subtitle}> Study Materials </Animatable.Text>
 
-         <View style={styles.stdview}>
-         {/* <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <FontAwesome
-              name="book"
-              color="#007FFF"
-              size={34}
-              
-            />
-
-            <Text style={{color: 'black'}}>Books</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons
-              name="notebook-check"
-              color="#007FFF"
-              size={34}
-            />
-
-            <Text style={{color: 'black'}}>UT 1</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons
-              name="notebook-check"
-              color="#007FFF"
-              size={34}
-            />
-
-            <Text style={{color: 'black'}}>UT 2</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons name="web" color="#007FFF" size={34} />
-
-            <Text style={{color: 'black'}}>Website</Text>
-          </TouchableOpacity> */}
+         <Animatable.View style={styles.stdview} animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver>
+        
 
           <TouchableOpacity
             onPress={() => {
               if (!netc) {
                 navigation.navigate('BooksShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -469,7 +721,7 @@ export default function PageOne() {
               if (!netc) {
                 navigation.navigate('UtSubShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -484,7 +736,7 @@ export default function PageOne() {
               if (!netc) {
                 navigation.navigate('UttSubShow', somedata);
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
             }}
@@ -492,29 +744,15 @@ export default function PageOne() {
             <Ut width={'50%'} height={'100%'} />
             <Text style={styles.stdtxt}>Unit Test 2</Text>
           </TouchableOpacity>
-        </View>
+        </Animatable.View>
 
-        {/* <Text style={styles.subtitle}> GCT Alumni </Text>
+       
 
-        <TouchableOpacity
-          onPress={() => {
-            if (!netc) {
-              navigation.navigate('Alumine');
-            } else {
-              setSnvisible(true);
-            }
-          }}
-          style={styles.v1}>
-          <View style={styles.alutouch}>
-            <Alu width={'40%'} height={'100%'} />
+        <Animatable.Text animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver style={styles.subtitle}>Mess Food Menu</Animatable.Text>
 
-            <Text style={styles.alutxt}>Alumni Profiles</Text>
-          </View>
-        </TouchableOpacity> */}
-
-        <Text style={styles.subtitle}>Mess Food Menu</Text>
-
-        <View style={styles.v1}>
+        <Animatable.View style={styles.v1} animation={'zoomIn'}
+      duration={1000} delay={1200} useNativeDriver>
           <TouchableOpacity
             style={[styles.syltouch, {backgroundColor: '#E2FAFD'}]}
             onPress={() => {
@@ -524,7 +762,7 @@ export default function PageOne() {
                 url: 'https://mygct.org/app/uploads/boyshostel.pdf',
               });
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
               
@@ -543,7 +781,7 @@ export default function PageOne() {
                 url: 'https://mygct.org/app/uploads/girlshostel.pdf',
               });
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.LONG);
+                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
                 Vibration.vibrate(100);
               }
 
@@ -552,7 +790,7 @@ export default function PageOne() {
             <Food width={'40%'} height={'100%'} />
             <Text style={[styles.semst, {marginLeft: -35}]}>Girls</Text>
           </TouchableOpacity>
-        </View>
+        </Animatable.View> */}
       </ScrollView>
     </View>
   );

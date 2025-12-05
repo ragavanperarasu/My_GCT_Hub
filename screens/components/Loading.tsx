@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 
-const Loading = React.memo(({ loadtext }) => {
+const Loading = React.memo(() => {
   const animationSource = useMemo(
-    () => require('../../assets/animations/robo.json'),
+    () => require('../../assets/animations/loading.json'),
     []
   );
 
@@ -17,6 +17,10 @@ const Loading = React.memo(({ loadtext }) => {
         alignItems: 'center',
         backgroundColor: 'white',
       }}>
+        <StatusBar
+                backgroundColor="#ffffffff" // for Android
+                barStyle="dark-content" // for iOS and Android
+              />
       <LottieView
         source={animationSource}
         autoPlay
@@ -26,15 +30,6 @@ const Loading = React.memo(({ loadtext }) => {
           height: 250,
         }}
       />
-      <Text
-        style={{
-          color: '#007FFF',
-          textAlign: 'center',
-          fontWeight: '700',
-          fontSize: 23,
-        }}>
-        {loadtext}
-      </Text>
     </View>
   );
 });

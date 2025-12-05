@@ -19,7 +19,7 @@ export type RootStackParamList = {
   UserLogin:undefined;
   CreateNewAccount: undefined;
 
-  UploadSemqus: {subname: string};
+  UploadSemqus: {subname: string, pdfuri: string};
   UploadUtoqus: {subname: string};
   UploadUttqus: {subname: string};
   UploadBooks: {subname: string};
@@ -31,6 +31,7 @@ export type RootStackParamList = {
   UploaddAlumin: undefined;
   Dir: undefined;
   Att: undefined;
+  CameraScreen: {subname: string, pdfuri: string};
   Attcreate: undefined;
   Insertatt:{data:object}
   Attview:{data:object}

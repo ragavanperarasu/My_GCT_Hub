@@ -7,11 +7,16 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../RootParam';
 import {API_URL} from '@env';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import notifee, { AndroidImportance, AuthorizationStatus } from '@notifee/react-native';
+import notifee, {
+  AndroidImportance,
+  AuthorizationStatus,
+} from '@notifee/react-native';
 import axios from 'axios';
 import Loading from '../components/Loading';
 
-const GETTING_POST = "/getpost"
+import * as Animatable from 'react-native-animatable';
+
+const GETTING_POST = '/getpost';
 
 type SubShowScreenProp = StackNavigationProp<RootStackParamList, 'SubShow'>;
 
@@ -20,25 +25,19 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
   const {reqType, regType, depType, semType, access} = route.params;
   const [data, setData] = useState([]);
 
-  const [acc, setAcc] = useState(false);
+  const [acc, setAcc] = useState(true);
 
   const [load, setLoad] = useState(false);
-  const [loadtext, setLoadtext] = useState('Connecting to server');
 
   const [errtxt, setErrtxt] = useState('');
   const [snvisible, setSnvisible] = useState(false);
 
   const [expandedSubject, setExpandedSubject] = useState(null);
 
-
-
   useEffect(() => {
-    if(access === 'Student')
-      setAcc(false)
-    else if(access === 'Admin')
-      setAcc(true)
-    else if(access === 'Root')
-      setAcc(true)
+    if (access === 'Student') setAcc(true);
+    else if (access === 'Admin') setAcc(true);
+    else if (access === 'Root') setAcc(true);
     getData();
   }, []);
 
@@ -58,24 +57,22 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
         });
         setLoad(false);
       } catch (error) {
-     
         setLoad(false);
         setErrtxt('Network Problem');
         setSnvisible(true);
-   
       }
     };
     fetchData();
   }
 
-  function addView(subname:string, postdate:string) {
+  function addView(subname: string, postdate: string) {
     const fetchData = async () => {
       const jsonData = {
         department: depType,
         sem: semType,
         reg: regType,
         subname: subname,
-        postdate: postdate
+        postdate: postdate,
       };
       try {
         const url = API_URL + '/sem22view';
@@ -89,14 +86,14 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
     fetchData();
   }
 
-  function addDownc(subname:string, postdate:string) {
+  function addDownc(subname: string, postdate: string) {
     const fetchData = async () => {
       const jsonData = {
         department: depType,
         sem: semType,
         reg: regType,
         subname: subname,
-        postdate: postdate
+        postdate: postdate,
       };
       try {
         const url = API_URL + '/sem22downc';
@@ -110,7 +107,7 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
     fetchData();
   }
 
-  function addLike(subname:string, postdate:string) {
+  function addLike(subname: string, postdate: string) {
     const fetchData = async () => {
       const jsonData = {
         department: depType,
@@ -118,19 +115,18 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
         reg: regType,
         subname: subname,
         postdate: postdate,
-        mail: reqType
+        mail: reqType,
       };
       try {
         const url = API_URL + '/sem22like';
         axios.post(url, jsonData).then(res => {
           const resData = res.data;
-          if(resData === 'success'){
-            setErrtxt("Your Like Added")
-            setSnvisible(true)
-          }
-          else{
-            setErrtxt("Your Already Liked")
-            setSnvisible(true)
+          if (resData === 'success') {
+            setErrtxt('Your Like Added');
+            setSnvisible(true);
+          } else {
+            setErrtxt('Your Already Liked');
+            setSnvisible(true);
           }
         });
       } catch (error) {
@@ -142,25 +138,25 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
     fetchData();
   }
 
-async function sendLocalNotification() {
+  async function sendLocalNotification() {
     await notifee.createChannel({
       id: 'default',
       name: 'Default',
-      importance: AndroidImportance.HIGH
+      importance: AndroidImportance.HIGH,
     });
-  await notifee.displayNotification({
-    title: "Your Post Deleted",
-    body: 'Your Semester Question PDF Deleted Successfully',
-    android: {
-      channelId: 'default',        
-      smallIcon: 'ic_launcher',     
-      largeIcon: 'ic_launcher', 
-      pressAction: { id: 'default' }
-    },
-  });
-}
+    await notifee.displayNotification({
+      title: 'Your Post Deleted',
+      body: 'Your Semester Question PDF Deleted Successfully',
+      android: {
+        channelId: 'default',
+        smallIcon: 'ic_launcher',
+        largeIcon: 'ic_launcher',
+        pressAction: {id: 'default'},
+      },
+    });
+  }
 
-  function delPost(subname:string, oid:string) {
+  function delPost(subname: string, oid: string) {
     setLoad(true);
     const fetchData = async () => {
       const jsonData = {
@@ -168,18 +164,17 @@ async function sendLocalNotification() {
         sem: semType,
         reg: regType,
         subname: subname,
-        oid: oid
+        oid: oid,
       };
- 
+
       try {
         const url = API_URL + '/semdel22';
-        await axios.post(url, jsonData).then((res)=>{
-          if (res.data === "done"){
+        await axios.post(url, jsonData).then(res => {
+          if (res.data === 'done') {
             setLoad(false);
             sendLocalNotification();
             navigation.goBack();
-          }
-          else {
+          } else {
             setLoad(false);
             setErrtxt('Network Problem');
             setSnvisible(true);
@@ -195,160 +190,175 @@ async function sendLocalNotification() {
   }
 
   if (load) {
-    return (
-      <Loading loadtext={loadtext} />
-    );
+    return <Loading />;
   }
 
   return (
-    <View style={{flex: 1, backgroundColor: '#F5F5F5'}}>
-    
-          <Appbar.Header
-            style={{
-              backgroundColor: '#ffffffff',
-              elevation:20,
-              borderBottomLeftRadius:40,
-              borderBottomRightRadius:40,
-            }}>
-            <Appbar.Content
-              title="Semester Question"
-              color="#1CA9C9"
-              titleStyle={{fontWeight: '700', fontSize:20, textAlign:"center"}}
-            />
-          </Appbar.Header>
+    <View style={{flex: 1, backgroundColor: '#ffffffff'}}>
+      <ScrollView>
+        {data?.map((i, outerIndex) => (
 
-          <ScrollView>
-
-          {data?.map((i, outerIndex) => (
-  <View key={outerIndex} style={styles.outerContainer}>
-    
-
-    <TouchableOpacity
-      style={styles.subjectCard}
-      onPress={() =>
-        setExpandedSubject(expandedSubject === outerIndex ? null : outerIndex)
-      }>
-      <Text style={styles.subjectText}>{i.subname}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-         <Text style={{
-            color: '#5A4FCF',
-            fontSize: 16,
-            alignSelf: 'flex-start', marginRight:5, fontWeight:900
-            }}>({i.semqus.length})</Text>
-    <Icon
-      name={expandedSubject === outerIndex ? 'chevron-up' : 'chevron-down'}
-      size={28}
-      color={expandedSubject === outerIndex ? '#3F51B5' : '#757575'}
-    />
-    {acc && (
-  <TouchableOpacity
-    style={{ marginLeft: 15 }}
-    onPress={() =>
-      navigation.navigate('UploadSemqus', { subname: i.subname })
-    }>
-    <Icon name="plus-circle" size={28} color="#4CAF50" />
-  </TouchableOpacity>
-)}
-  </View>
-    </TouchableOpacity>
-
-
-    {expandedSubject === outerIndex && i.semqus?.map((j, innerIndex) => (
-      <View key={innerIndex} style={styles.section}>
- 
-        <View style={styles.iconRow}>
-          <View style={styles.profileIcon}>
-            <Nodejs width={60} height={53} />
-          </View>
-          
-          <View>
-            <Text style={styles.posterName}>{j.postby}</Text>
-            <Text style={styles.posterMail}>
-              Posted On :{' '}
-              {new Date(j.postdate).toISOString().split('T')[0]}
+          <Animatable.View 
+          animation={'zoomIn'}
+        duration={1000}
+        delay={outerIndex*60}
+        useNativeDriver={true}
+          key={outerIndex} style={styles.outerContainer}>
+            
+            <TouchableOpacity
+              style={styles.subjectCard}
+              onPress={() =>
+                setExpandedSubject(
+                  expandedSubject === outerIndex ? null : outerIndex,
+                )
+              }>
+              <Text style={styles.subjectText}>{i.subname}</Text>
               
-            </Text>
-          </View>
-         
-          
-        </View>
+              <Text style={{fontFamily: 'Philosopher', fontSize: 16, color: '#91A3B0'}}>Tap to View Posts</Text>
+              {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text
+                  style={{
+                    color: '#5A4FCF',
+                    fontSize: 16,
+                    alignSelf: 'flex-start',
+                    marginRight: 5,
+                    fontFamily:'Philosopher'
+                  }}>
+                  ({i.semqus.length})
+                </Text>
+                <Icon
+                  name={
+                    expandedSubject === outerIndex
+                      ? 'chevron-up'
+                      : 'chevron-down'
+                  }
+                  size={28}
+                  color={expandedSubject === outerIndex ? '#3F51B5' : '#757575'}
+                />
+                {acc && (
+                  <TouchableOpacity
+                    style={{marginLeft: 15}}
+                    onPress={() =>
+                      navigation.navigate('UploadSemqus', {subname: i.subname})
+                    }>
+                    <Icon name="plus-circle" size={28} color="#4CAF50" />
+                  </TouchableOpacity>
+                )}
 
-        <Text style={styles.postName}>{j.postname}</Text>
+              </View> */}
+                                <TouchableOpacity
+                    style={{marginLeft: 15}}
+                    onPress={() =>
+                      navigation.navigate('UploadSemqus', {subname: i.subname, pdfuri: ''})
+                    }>
+                    <Icon name="plus-circle" size={28} color="#4CAF50" />
+                  </TouchableOpacity>
+            </TouchableOpacity>
 
-        <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => {
-            addDownc(i.subname, j.postdate);
-            navigation.navigate('WebViewSave', {
-              url: `${API_URL}/${j.docurl}`,
-            });
-          }}>
-            <Icon name="download" size={24} color="#007bff" />
-            <Text style={styles.downloadText}>({j.downloadc})</Text>
-          </TouchableOpacity>
+            {expandedSubject === outerIndex &&
+              i.semqus?.map((j, innerIndex) => (
+                <View key={innerIndex} style={styles.section}>
+                  <View style={styles.iconRow}>
+                    <View style={styles.profileIcon}>
+                      <Nodejs width={60} height={53} />
+                    </View>
 
-          <TouchableOpacity style={styles.actionBtn} onPress={() => {
-            addView(i.subname, j.postdate);
-            navigation.navigate('WebViewShow', {
-              url: `${API_URL}/${j.docurl}`,
-            });
-          }}>
-            <Icon name="eye" size={24} color="#28a745" />
-            <Text style={styles.viewText}>({j.view})</Text>
-          </TouchableOpacity>
+                    <View>
+                      <Text style={styles.posterName}>{j.postby}</Text>
+                      <Text style={styles.posterMail}>
+                        Posted On :{' '}
+                        {new Date(j.postdate).toISOString().split('T')[0]}
+                      </Text>
+                    </View>
+                  </View>
 
-          <TouchableOpacity style={styles.actionBtn} onPress={() => {
-            addLike(i.subname, j.postdate);
-          }}>
-            <Icon name="heart" size={24} color="#dc3545" />
-            <Text style={styles.likeText}>({j.likec})</Text>
-          </TouchableOpacity>
+                  <Text style={styles.postName}>{j.postname}</Text>
 
-          <TouchableOpacity style={styles.actionBtn} onPress={() => {
-            navigation.navigate("Showcomments", {
-              com: j.comment,
-              subname: i.subname,
-              postdate: j.postdate,
-              sendurl: "/sem22com"
-            });
-          }}>
-            <Icon name="comment" size={24} color="#6c757d" />
-            <Text style={styles.commentText}>({j.comment?.length})</Text>
-          </TouchableOpacity>
+                  <View style={styles.actionRow}>
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => {
+                        addDownc(i.subname, j.postdate);
+                        navigation.navigate('WebViewSave', {
+                          url: `${API_URL}/${j.docurl}`,
+                        });
+                      }}>
+                      <Icon name="download" size={24} color="#007bff" />
+                      <Text style={styles.downloadText}>({j.downloadc})</Text>
+                    </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionBtn} onPress={() => {
-            if (reqType === j.postbymail){
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => {
+                        addView(i.subname, j.postdate);
+                        navigation.navigate('WebViewShow', {
+                          url: `${API_URL}/${j.docurl}`,
+                        });
+                      }}>
+                      <Icon name="eye" size={24} color="#28a745" />
+                      <Text style={styles.viewText}>({j.view})</Text>
+                    </TouchableOpacity>
 
-                      delPost(i.subname, j._id)
-                    }
-                    else{
-                      setErrtxt("Access Denied")
-                      setSnvisible(true)
-                    }
-          }}>
-            <Icon name="trash-can-outline" size={24} color="#CD5C5C" />
-          
-          </TouchableOpacity>
-        </View>
-      </View>
-    ))}
-  </View>
-))}
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => {
+                        addLike(i.subname, j.postdate);
+                      }}>
+                      <Icon name="heart" size={24} color="#dc3545" />
+                      <Text style={styles.likeText}>({j.likec})</Text>
+                    </TouchableOpacity>
 
-        </ScrollView>
-        <Snackbar
-          visible={snvisible}
-          onDismiss={() => setSnvisible(false)}
-          style={{backgroundColor: '#3B3C36', borderRadius: 10}}
-          action={{
-            label: 'Okay',
-            textColor: '#007FFF',
-            onPress: () => {
-              setSnvisible(false);
-            },
-          }}>
-          <Text style={{fontSize: 15, color: 'white'}}>{errtxt}</Text>
-        </Snackbar>
-      
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => {
+                        navigation.navigate('Showcomments', {
+                          com: j.comment,
+                          subname: i.subname,
+                          postdate: j.postdate,
+                          sendurl: '/sem22com',
+                        });
+                      }}>
+                      <Icon name="comment" size={24} color="#6c757d" />
+                      <Text style={styles.commentText}>
+                        ({j.comment?.length})
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => {
+                        if (reqType === j.postbymail) {
+                          delPost(i.subname, j._id);
+                        } else {
+                          setErrtxt('Access Denied');
+                          setSnvisible(true);
+                        }
+                      }}>
+                      <Icon
+                        name="trash-can-outline"
+                        size={24}
+                        color="#CD5C5C"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+          </Animatable.View>
+        ))}
+      </ScrollView>
+      <Snackbar
+        visible={snvisible}
+        onDismiss={() => setSnvisible(false)}
+        style={{backgroundColor: '#3B3C36', borderRadius: 10}}
+        action={{
+          label: 'Okay',
+          textColor: '#007FFF',
+          onPress: () => {
+            setSnvisible(false);
+          },
+        }}>
+        <Text style={{fontSize: 15, color: 'white'}}>{errtxt}</Text>
+      </Snackbar>
     </View>
   );
 }
@@ -387,24 +397,29 @@ const styles = StyleSheet.create({
   },
 
   outerContainer: {
-    marginHorizontal: 8,
+    marginHorizontal: 0,
   },
+
+
   subjectCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFF8DC',
-    padding: 12,
-    borderRadius: 15,
-    elevation: 10,
-    marginTop: 10,
+    // flexDirection: 'row',
+    // justifyContent: 'space-between',
+    // alignItems: 'center',
+    backgroundColor: '#ffffffff',
+    paddingVertical: 20,
+    paddingHorizontal:15,
+    // borderRadius: 15,
+    // elevation: 10,
+    // marginTop: 10,
   },
+
+
   subjectText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#A0785A',
+    fontSize: 16,
+    color: '#29AB87',
     flex: 1,
     marginRight: 10,
+    fontFamily:'Momo Trust Display'
   },
   createButton: {
     flexDirection: 'row',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ToastAndroid, Linking, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
+import * as Animatable from 'react-native-animatable';
 
   const searchData = [
     { key: "GCT College Official Website", link: "https://gct.ac.in/" },
@@ -66,21 +67,27 @@ export default function Search() {
   };
 
   return (
-    <KeyboardAvoidingView
+    <Animatable.View
       style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      animation={'zoomIn'}
+      duration={1000} delay={400}
+      useNativeDriver
     >
       <View style={styles.container}>
         <View style={styles.searchContainer}>
           <Searchbar
-            placeholder="Search Online"
+            placeholder="Search GCT Quick Link"
             onChangeText={handleSearch}
             value={searchQuery}
             style={styles.searchbar}
             placeholderTextColor="#B4B4B4"
-            iconColor='black'
-            theme={{ colors: { onSurfaceVariant: "black" } }}
+            iconColor='#4B0082'
+            theme={{ colors: { onSurfaceVariant: "#4B0082" } }}
             onIconPress={handleSearchIcon}
+            inputStyle={{
+    fontFamily: 'Philosopher',
+    fontSize: 16,
+  }}
           />
 
           {filteredData.length > 0 && (
@@ -101,14 +108,14 @@ export default function Search() {
           )}
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </Animatable.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFFFFF", padding:5},
   
-  searchContainer: { marginTop: 5 },
+  searchContainer: { marginTop: 0,},
   
   searchbar: { backgroundColor: "#EEEEEE", borderRadius:15},
   autocompleteContainer: {
@@ -125,7 +132,7 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     color: "black",
-    fontFamily: "sans-serif-condensed",
+    fontFamily: "Philosopher",
     fontSize: 15,
   },
 });

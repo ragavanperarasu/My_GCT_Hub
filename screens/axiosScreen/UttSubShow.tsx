@@ -34,7 +34,7 @@ export default function UttSubShow({route}:{route: SubShowScreenProp}) {
 
   useEffect(() => {
     if(access === 'Student')
-      setAcc(false)
+      setAcc(true)
     else if(access === 'Admin')
       setAcc(true)
     else if(access === 'Root')

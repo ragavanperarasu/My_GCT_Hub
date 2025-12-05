@@ -1,7 +1,11 @@
 import React from 'react';
-import { ScrollView, TouchableOpacity } from 'react-native';
-import { Portal, Dialog, Text } from 'react-native-paper';
-import styles from './Style1';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from 'react-native';
 
 const departments = [
   'Civil Engineering',
@@ -15,27 +19,51 @@ const departments = [
   'Production Engineering',
 ];
 
-function DepartmentDialog({ visible, onClose, onSelect }) {
+function DepartmentDialog({onSelect, onClose}) {
   return (
-    <Portal>
-      <Dialog visible={visible} style={styles.dialog} onDismiss={onClose}>
-        <Dialog.Title style={styles.title}>
-          Select Department
-        </Dialog.Title>
-        <Dialog.Content>
-          <ScrollView>
-            {departments.map((dept, index) => (
-              <TouchableOpacity key={index} onPress={() => onSelect(dept)}>
-                <Text variant="bodyMedium" style={styles.itemText}>
-                  {dept}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </Dialog.Content>
-      </Dialog>
-    </Portal>
+    <View style={styles.container}>
+      {/* Title */}
+      <Text style={styles.title}>Select Department</Text>
+
+      {/* List */}
+      <ScrollView style={{marginTop: 10}}>
+        {departments.map((dept, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              onSelect(dept);
+              onClose(); // close sheet after selection
+            }}
+            style={styles.item}>
+            <Text style={styles.itemText}>{dept}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
 export default React.memo(DepartmentDialog);
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 20,
+    color: '#1560BD',
+    fontFamily: 'Momo Trust Display',
+    textAlign: 'center',
+  },
+  item: {
+    paddingVertical: 13,
+    borderBottomWidth: 0.5,
+    borderColor: '#ccc',
+    
+  },
+  itemText: {
+    fontSize: 16,
+    fontFamily: 'Philosopher',
+    color: '#4B0082',
+  },
+});

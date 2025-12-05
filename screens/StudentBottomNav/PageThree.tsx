@@ -9,9 +9,18 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  ToastAndroid,
+  Vibration,
+  ActivityIndicator,
 } from 'react-native';
-import {Text, Snackbar, TextInput, Appbar, Avatar, Portal, Dialog, Button} from 'react-native-paper';
-import NetInfo from '@react-native-community/netinfo';
+import {
+  Text,
+  TextInput,
+  Appbar,
+  Portal,
+  Dialog,
+  Button,
+} from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -20,7 +29,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Cache} from 'react-native-cache';
 import {API_URL} from '@env';
 import Loading from '../components/Loading';
-import { useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import useNetworkStatus from '../functions/useNetworkStatus';
+import FastImage from 'react-native-fast-image';
+import FileViewer from 'react-native-file-viewer';
 
 const cache = new Cache({
   namespace: 'mygct',
@@ -33,32 +45,26 @@ const cache = new Cache({
 
 export default function PageThree() {
   const navigation = useNavigation();
-
+  const netc = useNetworkStatus();
   const [data, setData] = useState([]);
 
-  const [ava, setAva] = useState(false);
-  const [netc, setNetc] = useState(false);
-  const [errtxt, setErrtxt] = useState('');
-  const [snvisible, setSnvisible] = useState(false);
   const [message, setMessage] = useState('');
   const scrollViewRef = useRef(null);
 
   const [userdata, setUserdata] = React.useState({});
-
+  const [progress, setProgress] = useState(0);
   const [load, setLoad] = useState(false);
   const [loadtext, setLoadtext] = useState('Connecting to server');
 
-const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = React.useState(false);
 
-  const handleLongPress = (msg) => {
-    if(msg.mail !== userdata){
-      setErrtxt("You Can't Delete this Message");
-      setSnvisible(true);
+  const handleLongPress = msg => {
+    if (msg.mail !== userdata.mail) {
+      ToastAndroid.show("You Can't Delete this Message", ToastAndroid.LONG);
+      Vibration.vibrate(100);
+    } else {
+      setVisible(true);
     }
-    else{
-      setVisible(true)
-    }
-   
   };
 
   useEffect(() => {
@@ -70,13 +76,12 @@ const [visible, setVisible] = React.useState(false);
     loadCache();
   }, []);
 
-  function netStatusCheck() {
-    NetInfo.fetch().then(state => {
-      setNetc(!state.isConnected);
-    });
-  }
-
   const fetchData = async () => {
+    if (netc) {
+      ToastAndroid.show('No Internet Access', ToastAndroid.SHORT);
+      Vibration.vibrate(100);
+      return;
+    }
     setLoadtext('Connecting to server');
     setLoad(true);
     try {
@@ -117,8 +122,8 @@ const [visible, setVisible] = React.useState(false);
     };
     setData(prev => [...prev, msgObj]);
     setMessage('');
-    setLoadtext('Connecting to server')
-    setLoad(true)
+    setLoadtext('Send Your Message');
+    setLoad(true);
     const msgsendurl = `${API_URL}/msgtxt`;
     try {
       await axios
@@ -128,30 +133,32 @@ const [visible, setVisible] = React.useState(false);
           mail: userdata.mail,
         })
         .then(res => {
-          setLoad(false)
+          setLoad(false);
           if (res.data === 'done') {
-            setErrtxt('Send Successfully');
-            setSnvisible(true);
+            ToastAndroid.show('Message Send Successfully', ToastAndroid.LONG);
           } else {
-            setErrtxt('Message Not Send');
-            setSnvisible(true);
+            ToastAndroid.show('Message Not Send', ToastAndroid.LONG);
+            Vibration.vibrate(100);
           }
         });
     } catch (error) {
-      setLoad(false)
-      setErrtxt('Message Not Send');
-      setSnvisible(true);
+      setLoad(false);
+      ToastAndroid.show('Message Not Send', ToastAndroid.LONG);
+      Vibration.vibrate(100);
     }
   };
 
   if (load) {
-    return (
-<Loading loadtext={loadtext} />
-    );
+    return <Loading loadtext={loadtext} />;
   }
 
   const pickDocument = async () => {
     try {
+      if (netc) {
+        ToastAndroid.show('No Internet Access', ToastAndroid.SHORT);
+        Vibration.vibrate(100);
+        return;
+      }
       // 1. Let user pick a document (PDF or Image)
       const res = await DocumentPicker.pickSingle({
         type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
@@ -197,17 +204,18 @@ const [visible, setVisible] = React.useState(false);
         .then(res => {
           setLoad(false);
           if (res.data === 'done') {
-            setErrtxt('Sent successfully');
+            ToastAndroid.show('Sent successfully', ToastAndroid.LONG);
           } else {
-            setErrtxt('Message not sent');
+            ToastAndroid.show('Message Not Send', ToastAndroid.LONG);
+            Vibration.vibrate(100);
           }
           fetchData();
           setSnvisible(true);
         });
     } catch (err) {
       setLoad(false);
-      setErrtxt('Cancelled');
-      setSnvisible(true);
+      ToastAndroid.show('Message Not Send', ToastAndroid.LONG);
+      Vibration.vibrate(100);
     }
   };
 
@@ -223,17 +231,16 @@ const [visible, setVisible] = React.useState(false);
           const resData = res.data;
 
           if (resData === 'success') {
-            setErrtxt('Your Like Added');
-            setSnvisible(true);
+            ToastAndroid.show('Your Like Added', ToastAndroid.LONG);
             fetchData();
           } else {
-            setErrtxt('Your Already Liked');
-            setSnvisible(true);
+            ToastAndroid.show('Your Already Liked', ToastAndroid.LONG);
+            Vibration.vibrate(100);
           }
         });
       } catch (error) {
-        setErrtxt('Network Problem');
-        setSnvisible(true);
+        ToastAndroid.show('Network Problem', ToastAndroid.LONG);
+        Vibration.vibrate(100);
       }
     };
     fetchlikeData();
@@ -245,32 +252,36 @@ const [visible, setVisible] = React.useState(false);
       keyboardVerticalOffset={80}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{flex: 1}}>
-         <Portal>
-        <Dialog
-          visible={visible}
-          onDismiss={() => setVisible(false)}
-          style={{backgroundColor: '#F7F7F7'}}>
-          <Dialog.Icon icon="message-text" size={40} color="#C40234" />
-          <Dialog.Title style={{textAlign: 'center', color: '#C40234'}}>
-            Delete Message
-          </Dialog.Title>
-          <Dialog.Content>
-            <Text
-              variant="bodyMedium"
-              style={{color: 'black', fontSize: 17, textAlign: 'center'}}>
-              Are you sure you want to delete your Message?
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setVisible(false)} textColor="#6F2DA8">
-              Cancel
-            </Button>
-            <Button onPress={() => {setVisible(false);}} textColor="#6F2DA8">
-              Delete
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+        <Portal>
+          <Dialog
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            style={{backgroundColor: '#F7F7F7'}}>
+            <Dialog.Icon icon="message-text" size={40} color="#C40234" />
+            <Dialog.Title style={{textAlign: 'center', color: '#C40234'}}>
+              Delete Message
+            </Dialog.Title>
+            <Dialog.Content>
+              <Text
+                variant="bodyMedium"
+                style={{color: 'black', fontSize: 17, textAlign: 'center'}}>
+                Are you sure you want to delete your Message?
+              </Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setVisible(false)} textColor="#6F2DA8">
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  setVisible(false);
+                }}
+                textColor="#6F2DA8">
+                Delete
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
 
         <Appbar.Header
           style={{
@@ -278,7 +289,7 @@ const [visible, setVisible] = React.useState(false);
             margin: 7,
             boxShadow: '#0000003D 0 3 8',
             borderRadius: 10,
-            height: 40,
+            height: 50,
           }}>
           <AntDesign
             size={30}
@@ -310,30 +321,54 @@ const [visible, setVisible] = React.useState(false);
 
               return (
                 <View key={msg.id || index} style={styles.messageContainer}>
-                  <Pressable 
-                  // onLongPress={()=>handleLongPress(msg)}
-                   style={({ pressed }) => [
-        styles.messageBubble,
-        { opacity: pressed ? 0.8 : 1} // Change opacity on press
-      ]}
-                  >
+                  <Pressable
+                    onLongPress={() => handleLongPress(msg)}
+                    style={({pressed}) => [
+                      styles.messageBubble,
+                      {opacity: pressed ? 0.8 : 1}, // Change opacity on press
+                    ]}>
                     <Text style={styles.messageUser}>{msg.user}</Text>
                     {(msg.filepath || msg.fileUri) && isImage && (
                       <View style={styles.imageContainer}>
-                        <Image
-                          source={{
-                            uri: msg.fileUri || `${API_URL}/${msg.filepath}`,
-                          }}
-                          style={styles.imagePreview}
-                          resizeMode="cover"
-                        />
+                        {progress < 100 && (
+                          <Text style={styles.progressText}>
+                            Loading {progress}%
+                          </Text>
+                        )}
+
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.navigate('WebViewShow', {
+                              url: `${API_URL}/${msg.filepath}`,
+                            });
+                          }}>
+                          <FastImage
+                            style={styles.imagePreview}
+                            source={{
+                              uri: msg.fileUri || `${API_URL}/${msg.filepath}`,
+                              priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.cover}
+                            onProgress={e => {
+                              const percent = Math.round(
+                                (e.nativeEvent.loaded / e.nativeEvent.total) *
+                                  100,
+                              );
+                              setProgress(percent);
+                            }}
+                            onLoadEnd={() => setProgress(100)}
+                          />
+                        </TouchableOpacity>
                       </View>
                     )}
 
                     {(msg.filepath || msg.fileUri) && isPDF && (
-                      
-                        <TouchableOpacity style={styles.pdfContainer} onPress={()=>{
-                          navigation.navigate('WebViewShow', {url: `${API_URL}/${msg.filepath}`});
+                      <TouchableOpacity
+                        style={styles.pdfContainer}
+                        onPress={() => {
+                          navigation.navigate('WebViewShow', {
+                            url: `${API_URL}/${msg.filepath}`,
+                          });
                         }}>
                         <Icon
                           name="file-pdf"
@@ -349,8 +384,8 @@ const [visible, setVisible] = React.useState(false);
                           <Text style={styles.pdfFileName}>
                             {msg.text || 'Document.pdf'}
                           </Text>
-                        </View></TouchableOpacity>
-                      
+                        </View>
+                      </TouchableOpacity>
                     )}
 
                     {!(msg.filepath || msg.fileUri) && (
@@ -378,50 +413,34 @@ const [visible, setVisible] = React.useState(false);
         </ScrollView>
 
         {!(userdata?.roll === 'Student' || userdata?.roll === 'Normal') && (
-  <View style={styles.inputContainer}>
-    <TextInput
-      style={styles.textInput}
-      mode="flat"
-      underlineColor="transparent"
-      activeUnderlineColor="transparent"
-      placeholder="PDF Img Text Messages Only"
-      value={message}
-      onChangeText={setMessage}
-      placeholderTextColor={'#BABABA'}
-      multiline
-      textColor="black"
-      cursorColor="black"
-      numberOfLines={4} // 👈 helps estimate height
-  scrollEnabled={true}
-  
-      right={
-        <TextInput.Icon
-          icon="send"
-          onPress={sendMessage}
-          color={'white'}
-          style={{ backgroundColor: '#3a86ff', paddingLeft: 5}}
-        />
-      }
-      left={<TextInput.Icon icon="attachment" onPress={pickDocument} />}
-    />
-  </View>
-)}
-
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              mode="flat"
+              underlineColor="transparent"
+              activeUnderlineColor="transparent"
+              placeholder="PDF Img Text Messages Only"
+              value={message}
+              onChangeText={setMessage}
+              placeholderTextColor={'#BABABA'}
+              multiline
+              textColor="black"
+              cursorColor="black"
+              numberOfLines={4} // 👈 helps estimate height
+              scrollEnabled={true}
+              right={
+                <TextInput.Icon
+                  icon="send"
+                  onPress={sendMessage}
+                  color={'white'}
+                  style={{backgroundColor: '#3a86ff', paddingLeft: 5}}
+                />
+              }
+              left={<TextInput.Icon icon="attachment" onPress={pickDocument} />}
+            />
+          </View>
+        )}
       </View>
-
-      <Snackbar
-        visible={snvisible}
-        onDismiss={() => setSnvisible(false)}
-        style={{backgroundColor: '#3B3C36', borderRadius: 10}}
-        action={{
-          label: 'Okay',
-          textColor: '#007FFF',
-          onPress: () => {
-            setSnvisible(false);
-          },
-        }}>
-        <Text style={{fontSize: 15, color: 'white'}}>{errtxt}</Text>
-      </Snackbar>
     </KeyboardAvoidingView>
   );
 }
@@ -445,8 +464,8 @@ const styles = StyleSheet.create({
   messageUser: {
     color: '#FFBA00',
     fontSize: 14,
-    fontWeight:800,
-    marginBottom:5
+    fontWeight: 800,
+    marginBottom: 5,
   },
   timestampText: {
     color: '#d0d0d0',
@@ -484,7 +503,6 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginBottom: 8,
     marginHorizontal: -10,
-    marginTop: -9,
   },
   imagePreview: {
     width: 250,
@@ -536,5 +554,12 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: '#6200ee',
     borderRadius: 4,
+  },
+  progressText: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffffff',
+    zIndex: 1,
   },
 });

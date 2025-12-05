@@ -1,0 +1,21 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/DM Serif Text.ttf",
+      "sha1": "5b164640b74fe1a0eb0a726690fa72f798e219d8"
+    },
+    {
+      "path": "assets/fonts/Momo Trust Display.ttf",
+      "sha1": "9fb062d32ebb66a43281de7d9ec7015c29d15013"
+    },
+    {
+      "path": "assets/fonts/Philosopher.ttf",
+      "sha1": "b3b4bd1691da6e0c2b819e0ccf107364d97e25c1"
+    },
+    {
+      "path": "assets/fonts/Space Mono.ttf",
+      "sha1": "fae3a5a43b50e0408fd61e14383d94a023d332b0"
+    }
+  ]
+}

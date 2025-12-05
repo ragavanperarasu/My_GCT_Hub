@@ -74,35 +74,37 @@ const SmoothSlider = () => {
         scrollEventThrottle={16} // to get smooth scroll events
         scrollEnabled={true} // enable manual scroll
       >
-        {images.map((item) => (
-          <View key={item.id} style={styles.slide}>
-            <ImageBackground
-              source={item.image}
-              style={styles.image}
-              
-            >
+       {images.map((item) => (
+  <View key={item.id} style={styles.slide}>
+    <View style={styles.imageWrapper}> {/* <-- New wrapper */}
+      <ImageBackground
+        source={item.image}
+        style={styles.image}
+        imageStyle={{ borderRadius: 12 }} // <-- Properly rounds image inside
+      >
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+        </View>
 
-              <View style={styles.textContainer}>
-                <Text style={styles.title}>{item.title}</Text>
-              </View>
+        <View style={styles.dotInsideImage}>
+          {images.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                {
+                  backgroundColor: i === currentIndex ? '#3a86ff' : '#fff',
+                  opacity: i === currentIndex ? 1 : 0.4,
+                },
+              ]}
+            />
+          ))}
+        </View>
+      </ImageBackground>
+    </View>
+  </View>
+))}
 
-              <View style={styles.dotInsideImage}>
-                {images.map((_, i) => (
-                  <View
-                    key={i}
-                    style={[
-                      styles.dot,
-                      {
-                        backgroundColor: i === currentIndex ? '#3a86ff' : '#fff',
-                        opacity: i === currentIndex ? 1 : 0.4,
-                      },
-                    ]}
-                  />
-                ))}
-              </View>
-            </ImageBackground>
-          </View>
-        ))}
       </Animated.ScrollView>
     </View>
   );
@@ -110,17 +112,13 @@ const SmoothSlider = () => {
 
 const styles = StyleSheet.create({
   container: {
-    
+    display:'flex',
+    justifyContent:'center',
+    alignItems:"center",
+    width:'100%'
   },
-  slide: {
-    width: width,
-    alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    justifyContent: 'flex-end',
-  },
+
+
   gradientOverlay: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 12,
@@ -150,6 +148,29 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 4,
   },
+
+slide: {
+  width: width,
+  alignItems: 'center', // centers content horizontally
+  justifyContent: 'center', // centers content vertically if needed
+},
+
+imageWrapper: {
+  width: '96%', // smaller than full width for padding effect
+  height: 200,
+  borderRadius: 12,
+  overflow: 'hidden',
+  alignItems: 'center', // optional, keeps image centered inside
+  justifyContent: 'center',
+},
+
+image: {
+  width: '100%',
+  height: '100%',
+  justifyContent: 'flex-end',
+},
+
+
 });
 
 export default SmoothSlider;

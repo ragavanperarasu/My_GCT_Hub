@@ -21,10 +21,12 @@ import {useNavigation} from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 
 import {SelectList} from 'react-native-dropdown-select-list';
-import {API_URL} from '@env';
+
 import axios from 'axios';
 import Loading from './components/Loading';
 import useNetworkStatus from './functions/useNetworkStatus';
+
+const API_URL="http://192.168.150.104:5000"
 
 const deptdata = [
   {key: '1', value: 'Civil Engineering'},
@@ -113,9 +115,10 @@ export default function CreateNewAccount() {
 
     try {
       const url = API_URL + '/emailotp';
-
+console.log("otp json: ", jsonData)
       await axios.post(url, jsonData).then(res => {
         const resData = res.data;
+        console.log("otp response: ", resData)
         if (resData === 'send Successfully') {
           setLoad(false);
           setVisible(true);
@@ -286,7 +289,7 @@ export default function CreateNewAccount() {
                   justifyContent: 'space-between',
                   marginTop: 20,
                 }}>
-                <Pressable style={{width: '45%'}} onPress={handleOtpcheck}>
+                <Pressable style={{width: '45%'}} onPress={()=>setVisible(false)}>
                   {({pressed}) => (
                     <Surface
                       elevation={4}

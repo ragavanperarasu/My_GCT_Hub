@@ -18,6 +18,7 @@ import notifee, {
 } from '@notifee/react-native';
 import axios from 'axios';
 import Loading from '../components/Loading';
+import * as Animatable from 'react-native-animatable';
 
 const GETTING_POST = '/getpost';
 
@@ -34,7 +35,7 @@ export default function BooksShow({route}: {route: SubShowScreenProp}) {
   const [expandedSubject, setExpandedSubject] = useState(null);
 
   useEffect(() => {
-    if (access === 'Student') setAcc(false);
+    if (access === 'Student') setAcc(true);
     else if (access === 'Admin') setAcc(true);
     else if (access === 'Root') setAcc(true);
     getData();
@@ -209,7 +210,8 @@ export default function BooksShow({route}: {route: SubShowScreenProp}) {
         </Appbar.Header>
         <ScrollView>
           {data?.map((i, outerIndex) => (
-            <View key={outerIndex} style={styles.outerContainer}>
+            <Animatable.View key={outerIndex} style={styles.outerContainer} animation={'zoomIn'}
+      duration={800} useNativeDriver>
               <TouchableOpacity
                 style={styles.subjectCard}
                 onPress={() =>
@@ -254,7 +256,8 @@ export default function BooksShow({route}: {route: SubShowScreenProp}) {
 
               {expandedSubject === outerIndex &&
                 i.books?.map((j, innerIndex) => (
-                  <View key={innerIndex} style={styles.section}>
+                  <Animatable.View key={innerIndex} style={styles.section} animation={'zoomIn'}
+      duration={500} useNativeDriver>
                     <View style={styles.iconRow}>
                       <View style={styles.profileIcon}>
                         <Nodejs width={60} height={53} />
@@ -337,9 +340,9 @@ export default function BooksShow({route}: {route: SubShowScreenProp}) {
                         />
                       </TouchableOpacity>
                     </View>
-                  </View>
+                  </Animatable.View>
                 ))}
-            </View>
+            </Animatable.View>
           ))}
         </ScrollView>
 

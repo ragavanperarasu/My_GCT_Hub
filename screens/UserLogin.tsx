@@ -8,8 +8,12 @@ import {
   ToastAndroid,
   Pressable,
   Vibration,
+  Image,
+  Touchable,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
-import {TextInput, Surface, Icon} from 'react-native-paper';
+import {TextInput, Surface, Icon, Button} from 'react-native-paper';
 import {Cache} from 'react-native-cache';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,6 +31,9 @@ import BootSplash from 'react-native-bootsplash';
 import Loading from './components/Loading';
 import useNetworkStatus from './functions/useNetworkStatus';
 
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import Googlesvg from '../assets/images/g2.svg';
+
 const cache = new Cache({
   namespace: 'mygct',
   policy: {
@@ -36,39 +43,17 @@ const cache = new Cache({
   backend: AsyncStorage,
 });
 
+
+
 export default function UserLogin() {
   const navigation = useNavigation();
   const netc = useNetworkStatus();
 
-  const [mail, setMail] = useState('');
-  const [regno, setRegno] = useState('');
-  const [loadtext, setLoadtext] = useState('Connecting to server');
-
   const [load, setLoad] = useState(false);
 
   const fcmToken = useFirebaseNotification();
+      
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      BootSplash.hide({fade: true});
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  //   useFocusEffect(
-  //     React.useCallback(() => {
-  //       const onBackPress = () => {
-  //         return true;
-  //       };
-
-  //       BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-  //       return () => {
-  //   BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  // };
-
-  //     }, []),
-  //   );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -81,46 +66,38 @@ export default function UserLogin() {
         onBackPress,
       );
 
+          setTimeout(() => {
+  BootSplash.hide({ fade: true });
+}, 200);
+
       return () => subscription.remove();
     }, []),
   );
 
   if (load) {
-    return <Loading loadtext={loadtext} />;
+    return <Loading />;
   }
 
-  function loginBackend() {
-    const jsonData = {
-      mail: mail,
-      regno: regno,
-    };
-
+  function loginBackend(jsonData) {
     const axiosSend = async () => {
       try {
-        const url = API_URL + '/userdata';
-        console.log(API_URL);
+        const url = 'http://192.168.150.104:5000' + '/newuser';
+
         await axios.post(url, jsonData).then(res => {
           const resData = res.data;
           setLoad(false);
-
-          if (resData === 'faild') {
-            setMail('');
-            ToastAndroid.show('Access Denied', ToastAndroid.SHORT);
-            Vibration.vibrate(100);
-          } else {
-            setLoad(true);
-            sendToken(resData);
-            setLoadtext('Fetching data...');
-            const setcahe = async () => await cache.set('userdata', resData);
+          if (resData === 'success') {
+            const setcahe = async () => await cache.set('userdata', jsonData);
             setcahe();
-            setLoad(false);
-
+            sendLocalNotification(jsonData.name);
             navigation.navigate('StudentHome');
-            sendLocalNotification(resData.name);
+          } else {
+            ToastAndroid.show('Something Issue', ToastAndroid.SHORT);
+            Vibration.vibrate(100);
+            return;
           }
         });
       } catch (error) {
-        setMail('');
         setLoad(false);
         ToastAndroid.show('Server Connection Problem', ToastAndroid.SHORT);
         Vibration.vibrate(100);
@@ -131,7 +108,6 @@ export default function UserLogin() {
 
   function sendToken(rdata) {
     const jsonData = {
-      mail: mail,
       token: fcmToken,
       dept: rdata.dept,
       gender: rdata.gender,
@@ -143,27 +119,10 @@ export default function UserLogin() {
 
         await axios.post(url, jsonData);
       } catch (error) {
-        setMail('');
         setLoad(false);
       }
     };
     axiosSend();
-  }
-
-  function handleClick() {
-    if (mail === '' || regno === '') {
-      ToastAndroid.show('Please, Complete all fields', ToastAndroid.SHORT);
-      Vibration.vibrate(100);
-    } else if (!mail.includes('@')) {
-      ToastAndroid.show('Enter Mail Id', ToastAndroid.SHORT);
-      Vibration.vibrate(100);
-    } else if (netc === true) {
-      ToastAndroid.show('No Internet Connection', ToastAndroid.SHORT);
-      Vibration.vibrate(100);
-    } else {
-      setLoad(true);
-      loginBackend();
-    }
   }
 
   async function sendLocalNotification(name) {
@@ -174,7 +133,7 @@ export default function UserLogin() {
     });
     await notifee.displayNotification({
       title: 'Hello, ' + name,
-      body: 'Welcome to MyGCT App',
+      body: 'Designed for GCT students to easily access notes, syllabi, question papers, and campus updates',
       android: {
         channelId: 'default',
         smallIcon: 'ic_launcher',
@@ -184,173 +143,178 @@ export default function UserLogin() {
     });
   }
 
+  const handleGoogleLogin = async () => {
+    if (netc === true) {
+      ToastAndroid.show('No Internet Connection', ToastAndroid.SHORT);
+      Vibration.vibrate(100);
+      return;
+    }
+    setLoad(true);
+    GoogleSignin.configure({
+      webClientId:
+        '324573151372-4pvjpehlgup6f8uvr3rfroc05fjk1ma9.apps.googleusercontent.com',
+      offlineAccess: true,
+      forceCodeForRefreshToken: true,
+      scopes: ['profile', 'email'],
+    });
+
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const tokens = await GoogleSignin.getTokens();
+      if (userInfo.data === null) {
+        ToastAndroid.show('Google Sign-In cancelled', ToastAndroid.SHORT);
+        Vibration.vibrate(100);
+        setLoad(false);
+        return;
+      }
+      setLoad(false);
+      loginBackend(userInfo.data?.user);
+      return {
+        user: userInfo,
+        tokens: tokens,
+      };
+    } catch (error) {
+      setLoad(false);
+      console.error('Google Sign-In Error: ', error);
+    }
+  };
+
   return (
-    <View style={{backgroundColor: '#F5F5F5'}}>
+    <View style={styles.view2}>
       <StatusBar
-        backgroundColor="#F5F5F5" // for Android
+        backgroundColor="#ffffffff" // for Android
         barStyle="dark-content" // for iOS and Android
       />
       <ScrollView style={styles.logincon2} keyboardShouldPersistTaps="handled">
-        <Text
-          style={{
-            fontSize: 30,
-            textAlign: 'center',
-            fontWeight: '700',
-            color: '#4B0082',
-          }}>
-          Welcome Back!
-        </Text>
+        <View style={styles.view1}>
+          <Image
+            source={require('../assets/images/mygcti.png')}
+            style={styles.img1}
+          />
+          <Text style={styles.text7}>My GCT Hub</Text>
+        </View>
+        <Text style={styles.text6}>Welcome Back</Text>
+        <Text style={styles.text8}>Sign in</Text>
         <LottieView
-          style={{width: '100%', height: 300}}
-          source={require('../assets/animations/anm1.json')}
+          style={{width: '100%', height: 250, marginTop: 30}}
+          source={require('../assets/animations/gl.json')}
           autoPlay
           loop
         />
-
-        <TextInput
-          mode="outlined"
-          placeholder="Mail Id"
-          onChangeText={text => {
-            setMail(text);
-          }}
-          style={styles.input}
-          activeOutlineColor="#6082B6"
-          textColor="black"
-          placeholderTextColor={'#C0C0C0'}
-          outlineStyle={{borderWidth: 1.5, elevation: 10}}
-          outlineColor="white"
-          theme={{
-            roundness: 10,
-          }}
-          left={<TextInput.Icon icon="gmail" />}
-        />
-        <TextInput
-          mode="outlined"
-          placeholder="Password"
-          onChangeText={text => {
-            setRegno(text);
-          }}
-          style={styles.input}
-          activeOutlineColor="#6082B6"
-          outlineColor="white"
-          placeholderTextColor={'#C0C0C0'}
-          outlineStyle={{borderWidth: 1.5, elevation: 10}}
-          secureTextEntry
-          textColor="black"
-          theme={{
-            roundness: 10,
-          }}
-          left={<TextInput.Icon icon="lastpass" />}
-        />
-
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 20,
-          }}>
-          <Pressable style={{width: '45%'}} onPress={handleClick}>
-            {({pressed}) => (
-              <Surface
-                elevation={4}
-                style={[
-                  styles.surface,
-                  pressed && {backgroundColor: '#6F2DA8'},
-                ]}>
-                <Text style={{color: 'white', fontSize: 16, fontWeight: 700}}>
-                  <Icon source="login" color={'white'} size={17} /> Login
-                </Text>
-              </Surface>
-            )}
-          </Pressable>
-
-          <Pressable
-            style={{width: '45%'}}
-            onPress={() => navigation.navigate('CreateNewAccount')}>
-            {({pressed}) => (
-              <Surface
-                elevation={4}
-                style={[
-                  styles.surface2,
-                  pressed && {backgroundColor: '#E5E4E2'},
-                ]}>
-                <Text
-                  style={{color: '#4B0082', fontSize: 16, fontWeight: '700'}}>
-                  <Icon source="account-plus" color="#4B0082" size={20} /> New
-                  User
-                </Text>
-              </Surface>
-            )}
-          </Pressable>
-        </View>
+        <Text style={styles.text5}>Continue with Google</Text>
+        <Text style={styles.text4}>My GCT Hub</Text>
+        <Text style={styles.text3}>Powered by Nexus Technology</Text>
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL('https://mygct.org/app/privacypolicy')
+          }>
+          <Text style={styles.text2}>View Privacy Policy</Text>
+        </TouchableOpacity>
       </ScrollView>
+      <Pressable style={styles.pressable1} onPress={handleGoogleLogin}>
+        {({pressed}) => (
+          <Surface
+            elevation={4}
+            style={[styles.surface2, pressed && {backgroundColor: '#6CB4EE'}]}>
+            <Googlesvg width={25} height={25} style={{marginRight: 10}} />
+            <Text style={styles.text1}>Continue with Google</Text>
+          </Surface>
+        )}
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'black',
-    height: '90%',
-  },
-  logincon: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    margin: 20,
-  },
   logincon2: {
     height: '100%',
-    borderRadius: 10,
-    padding: 20,
     width: '100%',
-  },
-  but: {
-    backgroundColor: '#007FFF',
-    borderRadius: 20,
-    marginTop: 20,
-    marginBottom: 10,
-    width: '45%',
-    height: 45,
-    elevation: 10,
-  },
-  but2: {
-    backgroundColor: '#DE3163',
-    borderRadius: 10,
-    marginTop: 10,
-    marginBottom: 10,
-    width: '100%',
-    height: 45,
-  },
-  butlab: {
-    color: 'white',
-    fontSize: 16,
-  },
-  input: {
-    marginVertical: 20,
-    backgroundColor: 'white',
-    color: 'black',
-    borderRadius: 10,
-    height: 45,
-  },
-  surface: {
-    padding: 8,
-    height: 45,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: '#4B0082',
   },
   surface2: {
-    padding: 8,
-    height: 45,
-    width: '100%',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#318CE7',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: {width: 0, height: 2},
+    elevation: 3,
+    margin: 20,
+  },
+  img1: {
+    width: 40,
+    height: 40,
+    marginRight: 10, // space between logo and text
+  },
+  view1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
+  view2: {backgroundColor: '#ffffffff', flex: 1},
+  text1: {
+    color: '#ffffffff',
+    fontSize: 14,
+    fontFamily: 'Momo Trust Display',
+  },
+  text2: {
+    fontSize: 13,
+    textAlign: 'center',
+    color: '#003262',
+    fontFamily: 'DM Serif Text',
+    marginTop: 10,
+  },
+  text3: {
+    fontSize: 13,
+    textAlign: 'center',
+    color: '#BEBFC5',
+    fontFamily: 'DM Serif Text',
+    marginTop: 30,
+  },
+  text4: {
+    fontSize: 20,
+    textAlign: 'center',
+    color: '#1560BD',
+    fontFamily: 'Momo Trust Display',
+  },
+
+  text5: {
+    fontSize: 18,
+    textAlign: 'center',
+
+    color: '#1560BD',
+    marginTop: -50,
+    fontFamily: 'Momo Trust Display',
+  },
+  text6: {
+    fontSize: 30,
+    textAlign: 'center',
+    color: '#1560BD',
+    marginTop: 30,
+    fontFamily: 'Momo Trust Display',
+  },
+  text7: {
+    fontSize: 18,
+    color: '#1560BD',
+    fontFamily: 'Momo Trust Display',
+  },
+  text8: {
+    fontSize: 25,
+    textAlign: 'center',
+    color: '#1560BD',
+    fontFamily: 'Momo Trust Display',
+  },
+  pressable1: {
+    width: '95%',
+    alignSelf: 'center',
+    marginTop: 20,
+    position: 'absolute',
+    bottom: 30,
   },
 });
