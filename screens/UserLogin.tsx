@@ -14,9 +14,7 @@ import {
   Linking,
 } from 'react-native';
 import {TextInput, Surface, Icon, Button} from 'react-native-paper';
-import {Cache} from 'react-native-cache';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
 import LottieView from 'lottie-react-native';
@@ -33,15 +31,7 @@ import useNetworkStatus from './functions/useNetworkStatus';
 
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Googlesvg from '../assets/images/g2.svg';
-
-const cache = new Cache({
-  namespace: 'mygct',
-  policy: {
-    maxEntries: 50000,
-    stdTTL: 0,
-  },
-  backend: AsyncStorage,
-});
+import {fetchUserAndUpdateCache} from './functions/userCacheService';
 
 
 
@@ -52,8 +42,6 @@ export default function UserLogin() {
   const [load, setLoad] = useState(false);
 
   const fcmToken = useFirebaseNotification();
-      
-
 
   useFocusEffect(
     React.useCallback(() => {
@@ -66,9 +54,9 @@ export default function UserLogin() {
         onBackPress,
       );
 
-          setTimeout(() => {
-  BootSplash.hide({ fade: true });
-}, 200);
+      setTimeout(() => {
+        BootSplash.hide({fade: true});
+      }, 200);
 
       return () => subscription.remove();
     }, []),
@@ -81,15 +69,23 @@ export default function UserLogin() {
   function loginBackend(jsonData) {
     const axiosSend = async () => {
       try {
-        const url = 'http://192.168.150.104:5000' + '/newuser';
+        const url = 'http://192.168.150.104:5000' + '/app/users/login';
 
-        await axios.post(url, jsonData).then(res => {
+        await axios.post(url, jsonData).then(async res => {
           const resData = res.data;
-          setLoad(false);
-          if (resData === 'success') {
-            const setcahe = async () => await cache.set('userdata', jsonData);
-            setcahe();
-            sendLocalNotification(jsonData.name);
+          
+          if (resData.status === 'success') {
+
+            const namef = await fetchUserAndUpdateCache(resData.useruid);
+            
+            if (namef === 'error') {
+              ToastAndroid.show('Something Issue', ToastAndroid.SHORT);
+              Vibration.vibrate(100);
+              setLoad(false);
+              return;
+            }
+            sendLocalNotification(namef);
+            setLoad(false);
             navigation.navigate('StudentHome');
           } else {
             ToastAndroid.show('Something Issue', ToastAndroid.SHORT);

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   ScrollView,
@@ -8,12 +8,14 @@ import {
   Text,
   Pressable,
   Image,
+  ToastAndroid,
+  Vibration
 } from 'react-native';
 import {
   Button,
   Dialog,
   Portal,
-  Icon,
+
   Surface,
   Switch,
 } from 'react-native-paper';
@@ -28,6 +30,8 @@ import * as Animatable from 'react-native-animatable';
 import StudentTitle from './TileBar/StudentTitle';
 import HeaderLogo from './components/HeaderLogo';
 import Feather from 'react-native-vector-icons/Feather';
+import RBSheet from "react-native-raw-bottom-sheet";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const cache = new Cache({
   namespace: 'mygct',
@@ -42,13 +46,13 @@ export default function About() {
   const navigation = useNavigation();
   const [userdata, setUserdata] = useState({});
 
-  const [visible, setVisible] = React.useState(false);
-  const [visible1, setVisible1] = React.useState(false);
 
   const [pdfcache, setPdfcache] = React.useState();
 
-  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
   const [load, setLoad] = useState(false);
+
+  const refRBSheetLogout = useRef();
+  const refRBSheetDelete = useRef();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,113 +71,143 @@ export default function About() {
 
   function delUser() {
     setLoad(true);
-    const jsonData = {
-      mail: userdata.mail,
-    };
-
     const axiosSend = async () => {
       try {
-        const url = API_URL + '/deluser';
-        await axios.post(url, jsonData).then(() => {
-          const rm = async () => {
+        const url = `http://192.168.150.104:5000/app/users/delete/${userdata._id}`;
+        console.log("url:", url);
+        await axios.delete(url).then(async (res)=> {
+          if(res.data.status === 'success'){
             await cache.clearAll();
-          };
-          rm();
-          setLoad(false);
-          navigation.navigate('UserLogin');
+            ToastAndroid.show('Account deleted successfully', ToastAndroid.SHORT);
+            Vibration.vibrate(100);
+            setLoad(false);
+            navigation.navigate('UserLogin');
+            return;
+          }
+          else{
+            ToastAndroid.show('Failed to delete account', ToastAndroid.SHORT);
+            Vibration.vibrate(100);
+            setLoad(false);
+            return;
+          }
         });
       } catch (error) {
+        ToastAndroid.show("Something Issue", ToastAndroid.SHORT);
+        console.log(error)
         setLoad(false);
-        // setMail('');
-        // setLoad(false);
-        // console.log(error)
       }
     };
     axiosSend();
   }
 
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+
 
   if (load) {
-    return <Loading loadtext={'Connecting to Server'} />;
+    return <Loading/>;
   }
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
-      <Portal>
-        <Dialog
-          visible={visible}
-          onDismiss={() => setVisible(false)}
-          style={{backgroundColor: '#F7F7F7'}}>
-          <Animatable.View
-            animation={'bounceIn'}
-            duration={2000}
-            useNativeDriver>
-            <Dialog.Icon icon="alert" size={40} color="#C40234" />
-            <Dialog.Title style={{textAlign: 'center', color: '#C40234'}}>
-              Account Delete
-            </Dialog.Title>
-          </Animatable.View>
-          <Dialog.Content>
-            <Text style={{color: 'black', fontSize: 17, textAlign: 'center'}}>
-              Are you sure you want to delete your account?
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setVisible(false)} textColor="#6F2DA8">
-              Cancel
-            </Button>
-            <Button
-              onPress={() => {
-                setVisible(false);
-                delUser();
-              }}
-              textColor="#6F2DA8">
-              Delete
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
 
-      <Portal>
-        <Dialog
-          visible={visible1}
-          onDismiss={() => setVisible1(false)}
-          style={{backgroundColor: '#F7F7F7'}}>
-          <Animatable.View
-            animation={'bounceIn'}
-            duration={2000}
-            useNativeDriver>
-            <Dialog.Icon icon="information" size={40} color="#FFBF00" />
-            <Dialog.Title style={{textAlign: 'center', color: '#FFBF00'}}>
-              Switch Account
-            </Dialog.Title>
-          </Animatable.View>
-          <Dialog.Content>
-            <Text style={{color: 'black', fontSize: 17, textAlign: 'center'}}>
-              Are you sure you want to switch accounts?
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setVisible1(false)} textColor="#6F2DA8">
-              Cancel
-            </Button>
-            <Button
-              onPress={() => {
-                setVisible1(false);
-                navigation.navigate('UserLogin');
-              }}
-              textColor="#6F2DA8">
-              Yes
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <RBSheet
+  ref={refRBSheetDelete}
+  closeOnDragDown={true}
+  closeOnPressMask={true}
+  height={300}
+  customStyles={{
+    container: styles.sheetContainer,
+    draggableIcon: styles.dragIcon,
+  }}
+>
+  {/* Icon */}
+  <View style={styles.iconContainer}>
+    <Feather name="trash-2" color="#C40234" size={42} />
+  </View>
+
+  {/* Title */}
+  <Text style={styles.rtitle}>Delete Account</Text>
+
+  {/* Message */}
+  <Text style={styles.message}>
+  Are you sure you want to delete your account? This will permanently delete
+  your profile, posts, likes, and all related data. This action cannot be undone.
+</Text>
+
+
+  {/* Buttons */}
+  <View style={styles.buttonRow}>
+    <TouchableOpacity
+      style={[styles.rbutton, styles.cancelBtn]}
+      onPress={() => refRBSheetDelete.current.close()}
+    >
+      <Text style={styles.cancelText}>Cancel</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.rbutton, styles.logoutBtn]}
+      onPress={async () => {
+        refRBSheetDelete.current.close();
+        delUser();
+      }}
+    >
+      <Feather name="trash" color="#fff" size={16} />
+      <Text style={styles.logoutText}> Delete</Text>
+    </TouchableOpacity>
+  </View>
+</RBSheet>
+
+
+<RBSheet
+  ref={refRBSheetLogout}
+  closeOnDragDown={true}
+  closeOnPressMask={true}
+  height={250}
+  customStyles={{
+    container: styles.sheetContainer,
+    draggableIcon: styles.dragIcon,
+  }}
+>
+  {/* Icon */}
+  <View style={styles.iconContainer}>
+    <Feather name="log-out" color="#C40234" size={42} />
+  </View>
+
+  {/* Title */}
+  <Text style={styles.rtitle}>Logout</Text>
+
+  {/* Message */}
+  <Text style={styles.message}>
+    Are you sure you want to logout from this account?
+  </Text>
+
+  {/* Buttons */}
+  <View style={styles.buttonRow}>
+    <TouchableOpacity
+      style={[styles.rbutton, styles.cancelBtn]}
+      onPress={() => refRBSheetLogout.current.close()}
+    >
+      <Text style={styles.cancelText}>Cancel</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.rbutton, styles.logoutBtn]}
+      onPress={async () => {
+        refRBSheetLogout.current.close();
+        await cache.remove("userdata");
+        navigation.navigate('UserLogin')
+      }}
+    >
+      <Feather name="power" color="#fff" size={16} />
+      <Text style={styles.logoutText}> Logout</Text>
+    </TouchableOpacity>
+  </View>
+</RBSheet>
+
 
       <ScrollView style={styles.scroll}>
         <View style={{alignItems: 'center', marginTop: 50}}>
           <Image
-            source={{uri: userdata.photo}}
+            source={{uri: userdata.profile}}
             style={{height: 100, width: 100, borderRadius: 100}}
           />
           <Text
@@ -203,6 +237,160 @@ export default function About() {
             }}>
             Version 1.10
           </Text>
+        </View>
+
+        <View style={{marginLeft: 10}}>
+          <Text
+            style={{
+              color: '#808080',
+              marginLeft: 5,
+              fontFamily: 'Momo Trust Display',
+              fontSize: 14,
+              marginTop: 10,
+            }}>
+            Your Post
+          </Text>
+        </View>
+
+
+        <View
+          style={{
+            backgroundColor: '#eeeeeeff',
+            margin: 10,
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            borderRadius: 15,
+          }}>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }}>
+            <MaterialCommunityIcons name="notebook-edit-outline" size={20} color="#008080" />
+            <Text
+              style={{
+                color: '#008080',
+                marginLeft: 10,
+                fontFamily: 'Philosopher',
+                fontSize: 18,
+              }}>
+              Reference Notes
+            </Text>
+          </TouchableOpacity>
+          <View style={{borderColor: '#C0C0C0', borderWidth: 0.5}}></View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }}>
+            <MaterialCommunityIcons name="clipboard-edit-outline" size={20} color="#6F2DA8" />
+            <Text
+              style={{
+                color: '#6F2DA8',
+                marginLeft: 10,
+                fontFamily: 'Philosopher',
+                fontSize: 18,
+              }}>
+              Semester Questions 
+            </Text>
+          </TouchableOpacity>
+          <View style={{borderColor: '#C0C0C0', borderWidth: 0.5}}></View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }}>
+            <MaterialCommunityIcons name="bookshelf" size={20} color="#c93702ff" />
+            <Text
+              style={{
+                color: '#c93702ff',
+                marginLeft: 10,
+                fontFamily: 'Philosopher',
+                fontSize: 18,
+              }}>
+              Reference Material
+            </Text>
+          </TouchableOpacity>
+          <View style={{borderColor: '#C0C0C0', borderWidth: 0.5}}></View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }}>
+            <MaterialCommunityIcons name="clipboard-list-outline" size={20} color="#8d4b89ff" />
+            <Text
+              style={{
+                color: '#8d4b89ff',
+                marginLeft: 10,
+                fontFamily: 'Philosopher',
+                fontSize: 18,
+              }}>
+              Unit Test Questions
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{marginLeft: 10}}>
+          <Text
+            style={{
+              color: '#808080',
+              marginLeft: 5,
+              fontFamily: 'Momo Trust Display',
+              fontSize: 14,
+              marginTop: 10,
+            }}>
+            Profile Edit
+          </Text>
+        </View>
+
+
+        <View
+          style={{
+            backgroundColor: '#eeeeeeff',
+            margin: 10,
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            borderRadius: 15,
+          }}>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }}>
+            <MaterialCommunityIcons name="rename-box" size={20} color="#008080" />
+            <Text
+              style={{
+                color: '#008080',
+                marginLeft: 10,
+                fontFamily: 'Philosopher',
+                fontSize: 18,
+              }}>
+              Change Username
+            </Text>
+          </TouchableOpacity>
+          <View style={{borderColor: '#C0C0C0', borderWidth: 0.5}}></View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }} onPress={()=>refRBSheetLogout.current.open()}>
+            <MaterialCommunityIcons name="account-circle-outline" size={20} color="#246BCE" />
+            <Text
+              style={{
+                color: '#246BCE',
+                marginLeft: 10,
+                fontFamily: 'Philosopher',
+                fontSize: 18,
+              }}>
+              Change Profile Picture
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{marginLeft: 10}}>
@@ -289,7 +477,7 @@ export default function About() {
               flexDirection: 'row',
               alignItems: 'center',
               marginVertical: 10,
-            }}>
+            }} onPress={()=>refRBSheetLogout.current.open()}>
             <Feather name="log-out" size={20} color="#246BCE" />
             <Text
               style={{
@@ -307,7 +495,7 @@ export default function About() {
               flexDirection: 'row',
               alignItems: 'center',
               marginVertical: 10,
-            }}>
+            }} onPress={()=>refRBSheetDelete.current.open()}>
             <Feather name="user-x" size={20} color="#B31B1B" />
             <Text
               style={{
@@ -320,137 +508,6 @@ export default function About() {
             </Text>
           </TouchableOpacity>
         </View>
-
-        {/* <Animatable.View animation={'slideInUp'} useNativeDriver style={styles.center}>
-          <Text  style={styles.header}>{userdata.roll} Account</Text>
-          <Text style={styles.subHeader}>Version 1.10</Text>
-        </Animatable.View> */}
-
-        {/* <Animatable.View animation={'slideInRight'} useNativeDriver style={styles.section}>
-          <View  style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Icon source="memory" size={50} color="#007FFF" />
-          </View>
-          <Text style={styles.title}>Private Memory Usage</Text>
-          <Text style={styles.text}>
-            <Icon source="file-pdf-box" color="#007FFF" size={20} />{" "}PDF File : {pdfcache}
-          </Text>
-        </Animatable.View> */}
-
-        {/* <Animatable.View animation={'slideInLeft'} useNativeDriver style={styles.section}>
-          <View  style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Icon source="shield-account" size={50} color="#007FFF" />
-          </View>
-          <Text style={styles.title}>User Profile</Text>
-          <Text style={styles.text}>
-            <Icon source="account" color="#007FFF" size={20} /> {userdata.name}
-          </Text>
-          <Text style={styles.text}>
-            <Icon source="email" color="#007FFF" size={20} /> {userdata.mail}
-          </Text>
-          <Text style={styles.text}>
-            <Icon source="book-education" color="#007FFF" size={20} />{' '}
-            {userdata.dept}
-          </Text>
-
-          <Text style={styles.text}>
-            <Icon
-              source={
-                userdata.gender === 'Male' ? 'gender-male' : 'gender-female'
-              }
-              size={20}
-              color={'#007FFF'}
-            />
-            {'  '}
-            {userdata.gender}
-          </Text>
-        </Animatable.View> */}
-
-        {/* <Animatable.View
-          animation={'slideInRight'}
-          useNativeDriver
-          style={styles.section}>
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Icon source="account-circle" size={50} color="#007FFF" />
-          </View>
-
-          <Text style={styles.title}>Account Activity</Text>
-
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginVertical: 20,
-            }}>
-            <Pressable style={{width: '45%'}} onPress={() => setVisible1(true)}>
-              {({pressed}) => (
-                <Surface
-                  elevation={4}
-                  style={[
-                    styles.surface,
-                    pressed && {backgroundColor: '#6F2DA8'},
-                  ]}>
-                  <Text style={{color: 'white', fontSize: 16, fontWeight: 700}}>
-                    <Icon source="account-switch" color={'white'} size={17} />{' '}
-                    Switch
-                  </Text>
-                </Surface>
-              )}
-            </Pressable> */}
-
-        {/* onPress={() => setVisible(true)} */}
-        {/* <Pressable
-              style={{width: '45%'}}
-              onPress={() => navigation.navigate('CameraScreen')}>
-              {({pressed}) => (
-                <Surface
-                  elevation={4}
-                  style={[
-                    styles.surface2,
-                    pressed && {backgroundColor: '#E5E4E2'},
-                  ]}>
-                  <Text
-                    style={{color: 'white', fontSize: 16, fontWeight: '700'}}>
-                    <Icon source="delete" color="white" size={20} /> Delete
-                  </Text>
-                </Surface>
-              )}
-            </Pressable>
-          </View>
-        </Animatable.View> */}
-
-        {/* <View style={[styles.section, {marginBottom: 30}]}>
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Icon source="android" size={50} color="#007FFF" />
-          </View>
-          <Text style={styles.title}>Developer Support</Text>
-          <View style={styles.iconRow}>
-            <TouchableOpacity
-              onPress={() =>
-                Linking.openURL('https://www.linkedin.com/in/ragavandevp/')
-              }
-              style={styles.iconCircle}>
-              <Icon source="linkedin" size={50} color="#007FFF" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                Linking.openURL('https://github.com/ragavanperarasu')
-              }
-              style={styles.iconCircle}>
-              <Icon source="github" size={50} color="#000000ff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => Linking.openURL('https://ragavan.vercel.app/')}
-              style={styles.iconCircle}>
-              <Icon source="web" size={50} color="#189ea3ff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => Linking.openURL('https://wa.me/919487745405')}
-              style={styles.iconCircle}>
-              <Icon source="whatsapp" size={50} color="#4ad151ff" />
-            </TouchableOpacity>
-          </View>
-        </View> */}
       </ScrollView>
     </View>
   );
@@ -460,101 +517,73 @@ const styles = StyleSheet.create({
   scroll: {
     backgroundColor: '#ffffffff',
   },
-  center: {
-    alignItems: 'flex-start',
-    backgroundColor: 'white',
-    marginHorizontal: 5,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 30,
-    borderRadius: 20,
-    elevation: 15,
-    marginTop: 10,
+
+  // RBSheet styles
+  sheetContainer: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    alignItems: "center",
   },
-  header: {
-    color: 'black',
-    fontSize: 25,
-    fontFamily: 'sans-serif-condensed',
+
+  dragIcon: {
+    backgroundColor: "#ccc",
+    width: 50,
+  },
+
+  iconContainer: {
+    marginVertical: 10,
+  },
+
+  rtitle: {
+    fontSize: 20,
+    fontFamily: 'Momo Trust Display',
+    color: "#C40234",
     marginTop: 5,
   },
-  subHeader: {
-    fontSize: 15,
-    fontFamily: 'sans-serif-condensed',
-    color: '#8B8589',
+
+  message: {
+    textAlign: "center",
+    fontFamily: 'Philosopher',
+    fontSize: 16,
+    color: "#333",
+    marginVertical: 15,
   },
-  section: {
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    marginHorizontal: 5,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginTop: 20,
-    borderRadius: 20,
-    elevation: 15,
-  },
-  title: {
-    color: '#007FFF',
-    fontSize: 20,
-    fontFamily: 'sans-serif-condensed',
-    textAlign: 'center',
-    fontWeight: '700',
-    marginVertical: 5,
-  },
-  text: {
-    fontSize: 18,
-    fontFamily: 'sans-serif-condensed',
-    marginVertical: 10,
-    color: '#8B8589',
-  },
-  button: {
-    backgroundColor: '#00A550',
-    borderRadius: 15,
+
+  buttonRow: {
+    flexDirection: "row",
+    width:'100%',
     marginTop: 10,
-    marginBottom: 10,
-    width: '100%',
   },
-  butlab: {
-    color: 'white',
-    fontSize: 18,
-    padding: 5,
+
+  rbutton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    marginHorizontal: 10,
   },
-  button1: {
-    backgroundColor: '#E60026',
-    borderRadius: 15,
-    marginTop: 10,
-    marginBottom: 10,
-    width: '100%',
+
+  cancelBtn: {
+    backgroundColor: "#E0E0E0",
   },
-  butlab1: {
-    color: 'white',
-    fontSize: 18,
-    padding: 5,
+
+  logoutBtn: {
+    backgroundColor: "#C40234",
   },
-  iconRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+
+  cancelText: {
+    color: "#333",
+    fontSize: 16,
+    fontFamily: 'Philosopher',
   },
-  iconCircle: {
-    marginVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  surface: {
-    padding: 8,
-    height: 45,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: '#00A550',
-  },
-  surface2: {
-    padding: 8,
-    height: 45,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: '#E60026',
+
+  logoutText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: 'Philosopher',
   },
 });

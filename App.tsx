@@ -13,6 +13,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import {RootStackParamList} from './screens/RootParam';
 
+import PageOne from './screens/StudentBottomNav/PageOne';
 import StudentHome from './screens/StudentHome';
 import Dir from './screens/Dir';
 import SubShow from './screens/axiosScreen/SubShow';
@@ -50,6 +51,7 @@ import CameraScreen from './screens/CameraScreen';
 import notifee, { AuthorizationStatus, AndroidImportance } from '@notifee/react-native';
 import Immersive from 'react-native-immersive';
 import Pinenter from './screens/StudentBottomNav/Pinenter';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
@@ -86,19 +88,20 @@ useEffect(() => {
 }, []);
 
 
- useEffect(() => {
-    if (isAndroid15) {
-      Immersive.on();
-    }
+//  useEffect(() => {
+//     if (isAndroid15) {
+//       Immersive.on();
+//     }
 
-    return () => {
-      if (isAndroid15) {
-         Immersive.off();
-      }
-    };
-  }, []);
+//     return () => {
+//       if (isAndroid15) {
+//          Immersive.off();
+//       }
+//     };
+//   }, []);
 
   return (
+
 <PaperProvider>
   <Portal>
           <Dialog
@@ -154,6 +157,7 @@ useEffect(() => {
     headerTintColor: '#1560BD',
     
   })}/>
+    <Stack.Screen name="PageOne" component={PageOne} options={{ headerShown: false }}/>
       <Stack.Screen name="BooksShow" component={BooksShow} options={{ headerShown: false }}/>
       <Stack.Screen name="About" component={About} options={{ headerShown: true }}/>
       <Stack.Screen name="WebViewShow" component={WebViewShow} options={{ headerShown: false }}/>

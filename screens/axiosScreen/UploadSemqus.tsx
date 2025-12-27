@@ -28,6 +28,7 @@ import notifee, {
   AndroidImportance,
   AuthorizationStatus,
 } from '@notifee/react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Loading from '../components/Loading';
 
@@ -182,7 +183,8 @@ export default function UploadSemqus({route}: {route: SubShowScreenProp}) {
   console.log("post screen : ",subname, pdfuri);
 
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+   
+      <View style={{flex: 1, backgroundColor: 'white'}}>
       <View
         style={{
           paddingHorizontal: 10,
@@ -311,9 +313,9 @@ export default function UploadSemqus({route}: {route: SubShowScreenProp}) {
             Post
           </Text>
         </TouchableOpacity>
-      </View>
+      </View></View>
 
-    </View>
+   
   );
 }
 

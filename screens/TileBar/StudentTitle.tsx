@@ -48,7 +48,7 @@ function StudentTitle() {
           style={styles.avaContainer}
           onPress={() => refRBSheet.current.open()}
         >
-          <Image source={{ uri: userdata.photo }} style={styles.avatar} />
+          <Image source={{ uri: userdata.profile }} style={styles.avatar} />
         </TouchableOpacity>
 
         <Text style={{
