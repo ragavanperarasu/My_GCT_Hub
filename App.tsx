@@ -52,6 +52,8 @@ import notifee, { AuthorizationStatus, AndroidImportance } from '@notifee/react-
 import Immersive from 'react-native-immersive';
 import Pinenter from './screens/StudentBottomNav/Pinenter';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Feather from "react-native-vector-icons/Feather";
+
 
 
 
@@ -155,7 +157,6 @@ useEffect(() => {
     },
     headerBackTitleVisible: false,
     headerTintColor: '#1560BD',
-    
   })}/>
     <Stack.Screen name="PageOne" component={PageOne} options={{ headerShown: false }}/>
       <Stack.Screen name="BooksShow" component={BooksShow} options={{ headerShown: false }}/>

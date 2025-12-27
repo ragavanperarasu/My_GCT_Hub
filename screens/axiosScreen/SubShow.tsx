@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import React, {useEffect, useState, useLayoutEffect, useRef} from 'react';
+import {View, StyleSheet, ScrollView, TouchableOpacity, ToastAndroid, TextInput, Vibration} from 'react-native';
 import Nodejs from '../../assets/images/accoun.svg';
 import {Avatar, Card, Text, Button, Appbar, Snackbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -16,14 +16,21 @@ import Loading from '../components/Loading';
 
 import * as Animatable from 'react-native-animatable';
 
+import Feather from "react-native-vector-icons/Feather";
+import RBSheet from 'react-native-raw-bottom-sheet';
+
 const GETTING_POST = '/getpost';
 
 type SubShowScreenProp = StackNavigationProp<RootStackParamList, 'SubShow'>;
 
+const deptList = ['Civil','CSE', 'ECE', 'EEE','EIE','IBT', 'Mechanical', 'Production'];
+const regulationList = ['2019', '2022', '2023'];
+
+
 export default function SubShow({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
   const {reqType, regType, depType, semType, access} = route.params;
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([{'subname':'tamil'}]);
 
   const [acc, setAcc] = useState(true);
 
@@ -34,12 +41,35 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
 
   const [expandedSubject, setExpandedSubject] = useState(null);
 
+  const refRBSheet = useRef<RBSheet>(null);
+
+const [subjectName, setSubjectName] = useState('');
+const [selectedDepts, setSelectedDepts] = useState<string[]>([]);
+const [regulation, setRegulation] = useState('');
+
+
   useEffect(() => {
     if (access === 'Student') setAcc(true);
     else if (access === 'Admin') setAcc(true);
     else if (access === 'Root') setAcc(true);
-    getData();
+    //getData();
   }, []);
+
+
+
+  // Set header button here
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => refRBSheet.current?.open()}
+          style={{ marginRight: 5 }}
+        >
+          <Feather name="plus" size={24} color="#1560BD" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   function getData() {
     setLoad(true);
@@ -65,430 +95,183 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
     fetchData();
   }
 
-  function addView(subname: string, postdate: string) {
-    const fetchData = async () => {
-      const jsonData = {
-        department: depType,
-        sem: semType,
-        reg: regType,
-        subname: subname,
-        postdate: postdate,
-      };
-      try {
-        const url = API_URL + '/sem22view';
-        axios.post(url, jsonData);
-      } catch (error) {
-        setLoad(false);
-        setErrtxt('Network Problem');
-        setSnvisible(true);
-      }
-    };
-    fetchData();
+  function addNewSubject(){
+    ToastAndroid.show('Something Issue', ToastAndroid.SHORT);
   }
 
-  function addDownc(subname: string, postdate: string) {
-    const fetchData = async () => {
-      const jsonData = {
-        department: depType,
-        sem: semType,
-        reg: regType,
-        subname: subname,
-        postdate: postdate,
-      };
-      try {
-        const url = API_URL + '/sem22downc';
-        axios.post(url, jsonData);
-      } catch (error) {
-        setLoad(false);
-        setErrtxt('Network Problem');
-        setSnvisible(true);
-      }
-    };
-    fetchData();
-  }
-
-  function addLike(subname: string, postdate: string) {
-    const fetchData = async () => {
-      const jsonData = {
-        department: depType,
-        sem: semType,
-        reg: regType,
-        subname: subname,
-        postdate: postdate,
-        mail: reqType,
-      };
-      try {
-        const url = API_URL + '/sem22like';
-        axios.post(url, jsonData).then(res => {
-          const resData = res.data;
-          if (resData === 'success') {
-            setErrtxt('Your Like Added');
-            setSnvisible(true);
-          } else {
-            setErrtxt('Your Already Liked');
-            setSnvisible(true);
-          }
-        });
-      } catch (error) {
-        setLoad(false);
-        setErrtxt('Network Problem');
-        setSnvisible(true);
-      }
-    };
-    fetchData();
-  }
-
-  async function sendLocalNotification() {
-    await notifee.createChannel({
-      id: 'default',
-      name: 'Default',
-      importance: AndroidImportance.HIGH,
-    });
-    await notifee.displayNotification({
-      title: 'Your Post Deleted',
-      body: 'Your Semester Question PDF Deleted Successfully',
-      android: {
-        channelId: 'default',
-        smallIcon: 'ic_launcher',
-        largeIcon: 'ic_launcher',
-        pressAction: {id: 'default'},
-      },
-    });
-  }
-
-  function delPost(subname: string, oid: string) {
-    setLoad(true);
-    const fetchData = async () => {
-      const jsonData = {
-        department: depType,
-        sem: semType,
-        reg: regType,
-        subname: subname,
-        oid: oid,
-      };
-
-      try {
-        const url = API_URL + '/semdel22';
-        await axios.post(url, jsonData).then(res => {
-          if (res.data === 'done') {
-            setLoad(false);
-            sendLocalNotification();
-            navigation.goBack();
-          } else {
-            setLoad(false);
-            setErrtxt('Network Problem');
-            setSnvisible(true);
-          }
-        });
-      } catch (error) {
-        setLoad(false);
-        setErrtxt('Network Problem');
-        setSnvisible(true);
-      }
-    };
-    fetchData();
-  }
 
   if (load) {
     return <Loading />;
   }
 
+  const toggleDept = (dept: string) => {
+  setSelectedDepts(prev =>
+    prev.includes(dept)
+      ? prev.filter(d => d !== dept)
+      : [...prev, dept]
+  );
+};
+
+
+const handleSubmit = () => {
+  if(!subjectName || !selectedDepts || !regulation){
+    ToastAndroid.show('Complete all fields', ToastAndroid.SHORT);
+    Vibration.vibrate(100)
+    return;
+  }
+  const payload = {
+    subjectName,
+    departments: selectedDepts,
+    regulation,
+  };
+
+  console.log('New Subject:', payload);
+
+  // reset
+  setSubjectName('');
+  setSelectedDepts([]);
+  setRegulation('');
+  refRBSheet.current?.close();
+};
+
+
   return (
     <View style={{flex: 1, backgroundColor: '#ffffffff'}}>
+
+      <RBSheet
+  ref={refRBSheet}
+  height={450}
+  openDuration={250}
+  customStyles={{
+    container: {
+      padding: 16,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+    },
+  }}
+>
+  <ScrollView>
+
+    {/* Subject Name */}
+    <Text style={styles.label}>Subject Name</Text>
+    <TextInput
+      placeholder="Enter subject name"
+      value={subjectName}
+      onChangeText={setSubjectName}
+      style={styles.input}
+    />
+
+    {/* Department (Multiple Select) */}
+    <Text style={styles.label}>Departments (Common)</Text>
+    {deptList.map(dept => (
+      <TouchableOpacity
+        key={dept}
+        style={styles.checkboxRow}
+        onPress={() => toggleDept(dept)}
+      >
+        <Feather
+          name={selectedDepts.includes(dept) ? 'check-square' : 'square'}
+          size={20}
+          color="#1560BD"
+        />
+        <Text style={styles.checkboxText}>{dept}</Text>
+      </TouchableOpacity>
+    ))}
+
+    {/* Regulation (Single Select) */}
+    <Text style={styles.label}>Regulation</Text>
+    {regulationList.map(reg => (
+      <TouchableOpacity
+        key={reg}
+        style={styles.radioRow}
+        onPress={() => setRegulation(reg)}
+      >
+        <Feather
+          name={regulation === reg ? 'radio' : 'circle'}
+          size={20}
+          color="#1560BD"
+        />
+        <Text style={styles.checkboxText}>{reg}</Text>
+      </TouchableOpacity>
+    ))}
+
+    {/* Submit Button */}
+    <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+      <Text style={styles.submitText}>Submit</Text>
+    </TouchableOpacity>
+
+  </ScrollView>
+</RBSheet>
+
       <ScrollView>
         {data?.map((i, outerIndex) => (
-
-          <Animatable.View 
-          animation={'zoomIn'}
-        duration={1000}
-        delay={outerIndex*60}
-        useNativeDriver={true}
-          key={outerIndex} style={styles.outerContainer}>
-            
-            <TouchableOpacity
-              style={styles.subjectCard}
-              onPress={() =>
-                setExpandedSubject(
-                  expandedSubject === outerIndex ? null : outerIndex,
-                )
-              }>
+          <Animatable.View
+            animation={'zoomIn'}
+            duration={1000}
+            delay={outerIndex * 60}
+            useNativeDriver={true}
+            key={outerIndex}
+            style={styles.outerContainer}>
+            <TouchableOpacity style={styles.subjectCard}>
               <Text style={styles.subjectText}>{i.subname}</Text>
-              
-              <Text style={{fontFamily: 'Philosopher', fontSize: 16, color: '#91A3B0'}}>Tap to View Posts</Text>
-              {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text
-                  style={{
-                    color: '#5A4FCF',
-                    fontSize: 16,
-                    alignSelf: 'flex-start',
-                    marginRight: 5,
-                    fontFamily:'Philosopher'
-                  }}>
-                  ({i.semqus.length})
-                </Text>
-                <Icon
-                  name={
-                    expandedSubject === outerIndex
-                      ? 'chevron-up'
-                      : 'chevron-down'
-                  }
-                  size={28}
-                  color={expandedSubject === outerIndex ? '#3F51B5' : '#757575'}
-                />
-                {acc && (
-                  <TouchableOpacity
-                    style={{marginLeft: 15}}
-                    onPress={() =>
-                      navigation.navigate('UploadSemqus', {subname: i.subname})
-                    }>
-                    <Icon name="plus-circle" size={28} color="#4CAF50" />
-                  </TouchableOpacity>
-                )}
 
-              </View> */}
-                                <TouchableOpacity
-                    style={{marginLeft: 15}}
-                    onPress={() =>
-                      navigation.navigate('UploadSemqus', {subname: i.subname, pdfuri: ''})
-                    }>
-                    <Icon name="plus-circle" size={28} color="#4CAF50" />
-                  </TouchableOpacity>
+              <Text
+                style={{
+                  fontFamily: 'Philosopher',
+                  fontSize: 16,
+                  color: '#91A3B0',
+                }}>
+                Tap to View Post
+              </Text>
             </TouchableOpacity>
-
-            {expandedSubject === outerIndex &&
-              i.semqus?.map((j, innerIndex) => (
-                <View key={innerIndex} style={styles.section}>
-                  <View style={styles.iconRow}>
-                    <View style={styles.profileIcon}>
-                      <Nodejs width={60} height={53} />
-                    </View>
-
-                    <View>
-                      <Text style={styles.posterName}>{j.postby}</Text>
-                      <Text style={styles.posterMail}>
-                        Posted On :{' '}
-                        {new Date(j.postdate).toISOString().split('T')[0]}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text style={styles.postName}>{j.postname}</Text>
-
-                  <View style={styles.actionRow}>
-                    <TouchableOpacity
-                      style={styles.actionBtn}
-                      onPress={() => {
-                        addDownc(i.subname, j.postdate);
-                        navigation.navigate('WebViewSave', {
-                          url: `${API_URL}/${j.docurl}`,
-                        });
-                      }}>
-                      <Icon name="download" size={24} color="#007bff" />
-                      <Text style={styles.downloadText}>({j.downloadc})</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.actionBtn}
-                      onPress={() => {
-                        addView(i.subname, j.postdate);
-                        navigation.navigate('WebViewShow', {
-                          url: `${API_URL}/${j.docurl}`,
-                        });
-                      }}>
-                      <Icon name="eye" size={24} color="#28a745" />
-                      <Text style={styles.viewText}>({j.view})</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.actionBtn}
-                      onPress={() => {
-                        addLike(i.subname, j.postdate);
-                      }}>
-                      <Icon name="heart" size={24} color="#dc3545" />
-                      <Text style={styles.likeText}>({j.likec})</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.actionBtn}
-                      onPress={() => {
-                        navigation.navigate('Showcomments', {
-                          com: j.comment,
-                          subname: i.subname,
-                          postdate: j.postdate,
-                          sendurl: '/sem22com',
-                        });
-                      }}>
-                      <Icon name="comment" size={24} color="#6c757d" />
-                      <Text style={styles.commentText}>
-                        ({j.comment?.length})
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.actionBtn}
-                      onPress={() => {
-                        if (reqType === j.postbymail) {
-                          delPost(i.subname, j._id);
-                        } else {
-                          setErrtxt('Access Denied');
-                          setSnvisible(true);
-                        }
-                      }}>
-                      <Icon
-                        name="trash-can-outline"
-                        size={24}
-                        color="#CD5C5C"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
           </Animatable.View>
         ))}
       </ScrollView>
-      <Snackbar
-        visible={snvisible}
-        onDismiss={() => setSnvisible(false)}
-        style={{backgroundColor: '#3B3C36', borderRadius: 10}}
-        action={{
-          label: 'Okay',
-          textColor: '#007FFF',
-          onPress: () => {
-            setSnvisible(false);
-          },
-        }}>
-        <Text style={{fontSize: 15, color: 'white'}}>{errtxt}</Text>
-      </Snackbar>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  section: {
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginVertical: 10,
-    borderRadius: 15,
-    boxShadow: '#0000003D 0 3 8',
+  label: {
+    fontSize: 16,
+    fontFamily: 'Momo Trust Display',
+    marginTop: 15,
+    marginBottom: 8,
+    color:'#1560BD'
   },
-  title: {
-    color: '#007FFF',
-    fontSize: 20,
-    fontFamily: 'sans-serif-condensed',
-    textAlign: 'center',
-    fontWeight: '700',
-    marginVertical: 10,
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
   },
-  iconRow: {
+  checkboxRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginVertical: 6,
   },
-  iconCircle: {
-    marginVertical: 20,
+  radioRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 6,
+  },
+  checkboxText: {
     marginLeft: 10,
-    height: 65,
-    width: 65,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '#0000003D 0 3 8',
-  },
-
-  outerContainer: {
-    marginHorizontal: 0,
-  },
-
-
-  subjectCard: {
-    // flexDirection: 'row',
-    // justifyContent: 'space-between',
-    // alignItems: 'center',
-    backgroundColor: '#ffffffff',
-    paddingVertical: 20,
-    paddingHorizontal:15,
-    // borderRadius: 15,
-    // elevation: 10,
-    // marginTop: 10,
-  },
-
-
-  subjectText: {
-    fontSize: 16,
-    color: '#29AB87',
-    flex: 1,
-    marginRight: 10,
-    fontFamily:'Momo Trust Display'
-  },
-  createButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#007bff',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-  },
-  createIcon: {
-    marginRight: 5,
-  },
-  createText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-
-  profileIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#e0e0e0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  posterName: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: '#333',
-  },
-  posterMail: {
-    fontSize: 14,
-    color: 'gray',
-  },
-  postDate: {
-    fontSize: 14,
-    color: 'gray',
-    marginVertical: 10,
-  },
-  postName: {
     fontSize: 15,
-    color: '#555',
-    marginVertical: 10,
+    color:'black',
+    fontFamily: 'Philosopher',
   },
-  actionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 10,
-  },
-  actionBtn: {
+  submitBtn: {
+    marginTop: 25,
+    backgroundColor: '#1560BD',
+    padding: 12,
+    borderRadius: 10,
     alignItems: 'center',
   },
-  downloadText: {
-    color: '#007bff',
-    fontSize: 12,
-  },
-  viewText: {
-    color: '#28a745',
-    fontSize: 12,
-  },
-  likeText: {
-    color: '#dc3545',
-    fontSize: 12,
-  },
-  commentText: {
-    color: '#6c757d',
-    fontSize: 12,
+  submitText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Philosopher',
   },
 });
