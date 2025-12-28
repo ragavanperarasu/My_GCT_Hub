@@ -5,7 +5,9 @@ export type RootStackParamList = {
   BooksShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
   UtSubShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
   UttSubShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
-  StuNoteShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
+
+  PostShow:{reqType : string, userid : string , subid : string, access : string};
+
   YoutubeShow:{reqType : string, regType : string , depType : string, semType : string};
   TimetableShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
   SyllShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
@@ -19,7 +21,8 @@ export type RootStackParamList = {
   UserLogin:undefined;
   CreateNewAccount: undefined;
 
-  UploadSemqus: {subname: string, pdfuri: string};
+  NewPost: {reqType: string, userid:string, subid: string, subname: string, pdfuri: string};
+
   UploadUtoqus: {subname: string};
   UploadUttqus: {subname: string};
   UploadBooks: {subname: string};

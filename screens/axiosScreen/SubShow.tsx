@@ -39,7 +39,6 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
 
   const {reqType, regType, depType, userType, access} = route.params;
-  console.log(route.params);
 
   const [data, setData] = useState([]);
 
@@ -178,7 +177,9 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
             useNativeDriver
             key={outerIndex}
             style={styles.outerContainer}>
-            <TouchableOpacity activeOpacity={0.8} style={styles.subjectCard}>
+            <TouchableOpacity activeOpacity={0.8} style={styles.subjectCard} onPress={()=>
+              navigation.navigate('PostShow',{reqType:reqType, userid:userType, subid:i._id, access:access})
+            }>
               <View style={styles.leftIcon}>
                 <Feather name="book-open" color="#1560BD" size={22} />
               </View>

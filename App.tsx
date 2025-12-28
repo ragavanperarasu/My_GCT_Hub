@@ -27,7 +27,7 @@ import SyllShow from './screens/axiosScreen/SyllShow';
 import Search from './screens/Search';
 import UserLogin from './screens/UserLogin';
 
-import UploadSemqus from './screens/axiosScreen/UploadSemqus';
+import NewPost from './screens/axiosScreen/NewPost';
 import UploadUtoqus from './screens/axiosScreen/UploadUtoqus';
 import UploadUttqus from './screens/axiosScreen/UploadUttqus';
 import UploadBooks from './screens/axiosScreen/UploadBooks';
@@ -163,14 +163,14 @@ useEffect(() => {
       <Stack.Screen name="WebViewSave" component={WebViewSave} options={{ headerShown: false }}/>
       <Stack.Screen name="UtSubShow" component={UtSubShow} options={{ headerShown: false }}/>
       <Stack.Screen name="UttSubShow" component={UttSubShow} options={{ headerShown: false }}/>
-      <Stack.Screen name="PostShow" component={PostShow} options={{ headerShown: false }}/>
+      <Stack.Screen name="PostShow" component={PostShow}/>
 
       <Stack.Screen name="TimetableShow" component={TimetableShow} options={{ headerShown: false }}/>
       <Stack.Screen name="SyllShow" component={SyllShow} options={{ headerShown: false }}/>
       <Stack.Screen name="Search" component={Search} options={{ headerShown: false }}/>
       <Stack.Screen name="UserLogin" component={UserLogin} options={{ headerShown: false }}/>
 
-      <Stack.Screen name="UploadSemqus" component={UploadSemqus} options={({ navigation }) => ({
+      <Stack.Screen name="NewPost" component={NewPost} options={({ navigation }) => ({
     title: "New Post",
     headerTitleAlign: 'center',
     headerTitleStyle: {

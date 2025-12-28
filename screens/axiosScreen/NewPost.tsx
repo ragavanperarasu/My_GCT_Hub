@@ -43,10 +43,10 @@ const cache = new Cache({
 
 type SubShowScreenProp = StackNavigationProp<
   RootStackParamList,
-  'UploadSemqus'
+  'NewPost'
 >;
 
-export default function UploadSemqus({route}: {route: SubShowScreenProp}) {
+export default function NewPost({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
   const {subname, pdfuri} = route.params;
 
@@ -92,7 +92,7 @@ export default function UploadSemqus({route}: {route: SubShowScreenProp}) {
   }, []);
 
   if (load) {
-    return <Loading loadtext={loadtext} />;
+    return <Loading  />;
   }
 
   const handlePickDocument = async () => {
@@ -193,7 +193,7 @@ export default function UploadSemqus({route}: {route: SubShowScreenProp}) {
           flexDirection: 'row',
         }}>
         <Image
-          source={{uri: userdata.photo}}
+          source={{uri: userdata.profile}}
           style={{
             width: 50,
             height: 50,
