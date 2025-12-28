@@ -17,7 +17,11 @@ import Loading from '../components/Loading';
 import * as Animatable from 'react-native-animatable';
 
 import Feather from "react-native-vector-icons/Feather";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import RBSheet from 'react-native-raw-bottom-sheet';
+
+import AddSubjectSheet from '../components/AddSubjectSheet';
+
 
 const GETTING_POST = '/getpost';
 
@@ -30,7 +34,7 @@ const regulationList = ['2019', '2022', '2023'];
 export default function SubShow({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
   const {reqType, regType, depType, semType, access} = route.params;
-  const [data, setData] = useState([{'subname':'tamil'}]);
+  const [data, setData] = useState([{'subname':'Tamil'},{'subname':'Probability, Random Process and Queueing Theory'},{'subname':'Theory of Computation'},{'subname':'Data Structure'},{'subname':'Java with Object Oriented Programming'},{'subname':'Network Security'}]);
 
   const [acc, setAcc] = useState(true);
 
@@ -58,18 +62,19 @@ const [regulation, setRegulation] = useState('');
 
 
   // Set header button here
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => refRBSheet.current?.open()}
-          style={{ marginRight: 5 }}
-        >
-          <Feather name="plus" size={24} color="#1560BD" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+useLayoutEffect(() => {
+  navigation.setOptions({
+    headerRight: () => (
+      <TouchableOpacity
+        onPress={() => refRBSheet.current?.open()}
+        style={{ marginRight: 5 }}
+      >
+        <Feather name="plus" size={24} color="#1560BD" />
+      </TouchableOpacity>
+    ),
+  });
+}, [navigation]);
+
 
   function getData() {
     setLoad(true);
@@ -104,41 +109,39 @@ const [regulation, setRegulation] = useState('');
     return <Loading />;
   }
 
-  const toggleDept = (dept: string) => {
-  setSelectedDepts(prev =>
-    prev.includes(dept)
-      ? prev.filter(d => d !== dept)
-      : [...prev, dept]
-  );
-};
+//   const toggleDept = (dept: string) => {
+//   setSelectedDepts(prev =>
+//     prev.includes(dept)
+//       ? prev.filter(d => d !== dept)
+//       : [...prev, dept]
+//   );
+// };
 
 
-const handleSubmit = () => {
-  if(!subjectName || !selectedDepts || !regulation){
-    ToastAndroid.show('Complete all fields', ToastAndroid.SHORT);
-    Vibration.vibrate(100)
-    return;
-  }
-  const payload = {
-    subjectName,
-    departments: selectedDepts,
-    regulation,
-  };
 
+
+const handleAddSubject = (payload: {
+  subjectName: string;
+  departments: string[];
+  regulation: string;
+}) => {
   console.log('New Subject:', payload);
 
-  // reset
-  setSubjectName('');
-  setSelectedDepts([]);
-  setRegulation('');
-  refRBSheet.current?.close();
+  // API call here if needed
 };
+
 
 
   return (
     <View style={{flex: 1, backgroundColor: '#ffffffff'}}>
 
-      <RBSheet
+      <AddSubjectSheet
+  ref={refRBSheet}
+  onSubmit={handleAddSubject}
+/>
+
+
+      {/* <RBSheet
   ref={refRBSheet}
   height={450}
   openDuration={250}
@@ -152,16 +155,15 @@ const handleSubmit = () => {
 >
   <ScrollView>
 
-    {/* Subject Name */}
     <Text style={styles.label}>Subject Name</Text>
     <TextInput
       placeholder="Enter subject name"
       value={subjectName}
       onChangeText={setSubjectName}
       style={styles.input}
+      
     />
 
-    {/* Department (Multiple Select) */}
     <Text style={styles.label}>Departments (Common)</Text>
     {deptList.map(dept => (
       <TouchableOpacity
@@ -178,7 +180,6 @@ const handleSubmit = () => {
       </TouchableOpacity>
     ))}
 
-    {/* Regulation (Single Select) */}
     <Text style={styles.label}>Regulation</Text>
     {regulationList.map(reg => (
       <TouchableOpacity
@@ -195,43 +196,97 @@ const handleSubmit = () => {
       </TouchableOpacity>
     ))}
 
-    {/* Submit Button */}
+
     <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
       <Text style={styles.submitText}>Submit</Text>
     </TouchableOpacity>
 
   </ScrollView>
-</RBSheet>
+</RBSheet> */}
 
-      <ScrollView>
-        {data?.map((i, outerIndex) => (
-          <Animatable.View
-            animation={'zoomIn'}
-            duration={1000}
-            delay={outerIndex * 60}
-            useNativeDriver={true}
-            key={outerIndex}
-            style={styles.outerContainer}>
-            <TouchableOpacity style={styles.subjectCard}>
-              <Text style={styles.subjectText}>{i.subname}</Text>
 
-              <Text
-                style={{
-                  fontFamily: 'Philosopher',
-                  fontSize: 16,
-                  color: '#91A3B0',
-                }}>
-                Tap to View Post
-              </Text>
-            </TouchableOpacity>
-          </Animatable.View>
-        ))}
-      </ScrollView>
+<ScrollView showsVerticalScrollIndicator={false}>
+  {data?.map((i, outerIndex) => (
+    <Animatable.View
+      animation="zoomIn"
+      duration={800}
+      delay={outerIndex * 80}
+      useNativeDriver
+      key={outerIndex}
+      style={styles.outerContainer}
+    >
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.subjectCard}
+        // onPress={() =>
+        //   navigation.navigate("SubjectDetails", { subject: i })
+        // }
+      >
+        {/* Left Icon */}
+        <View style={styles.leftIcon}>
+           <Feather name="book-open" color="#1560BD" size={22} />
+        </View>
+
+        {/* Subject Name */}
+        <View style={styles.textContainer}>
+          <Text style={styles.subjectText}>{i.subname}</Text>
+          <Text style={styles.subText}>Tap to view post</Text>
+        </View>
+
+        {/* Right Arrow */}
+        <Feather name="chevron-right" size={22} color="#9CA3AF" />
+      </TouchableOpacity>
+    </Animatable.View>
+  ))}
+</ScrollView>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    marginHorizontal: 10,
+    marginTop: 12,
+  },
+
+  subjectCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderColor:'#000000ff',
+    borderWidth:0.5,
+  },
+
+  leftIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#E8F0FE",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
+  },
+
+  textContainer: {
+    flex: 1,
+  },
+
+  subjectText: {
+    fontSize: 15,
+    fontFamily: 'Momo Trust Display',
+    color: "#00A86B",
+  },
+
+  subText: {
+    fontSize: 12,
+    color: "#6B7280",
+    fontFamily: 'Philosopher',
+    marginTop: 2,
+  },
   label: {
     fontSize: 16,
     fontFamily: 'Momo Trust Display',
@@ -244,6 +299,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     padding: 10,
+    fontFamily:'Philosopher',
   },
   checkboxRow: {
     flexDirection: 'row',
