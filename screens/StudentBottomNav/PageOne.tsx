@@ -4,7 +4,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  ToastAndroid, Vibration, Button
+  ToastAndroid,
+  Vibration,
+  Button,
 } from 'react-native';
 import {Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -24,7 +26,7 @@ import useNetworkStatus from '../functions/useNetworkStatus';
 
 import * as Animatable from 'react-native-animatable';
 
-import RBSheet from "react-native-raw-bottom-sheet";
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/Feather';
@@ -40,8 +42,6 @@ const cache = new Cache({
   backend: AsyncStorage,
 });
 
-
-
 export default function PageOne() {
   const navigation = useNavigation();
   const netc = useNetworkStatus();
@@ -56,7 +56,7 @@ export default function PageOne() {
 
   const [userdata, setUserdata] = React.useState({});
 
-  const [tempdept, setTempdept] = React.useState('Civil Engineering');
+  const [tempdept, setTempdept] = React.useState('Civil');
   const [tempsem, setTempsem] = React.useState('Semester 1');
   const [tempreg, setTempreg] = React.useState('2022');
 
@@ -97,11 +97,11 @@ export default function PageOne() {
       if (!cacheUserData) {
         navigation.navigate('UserLogin');
       } else if (!ctempdept || !ctempsem) {
-        await cache.set('tempdept', 'Civil Engineering');
-        await cache.set('tempsem', 'Semester 1');
+        await cache.set('tempdept', 'Civil');
+        await cache.set('tempsem', '2022');
         setUserdata(cacheUserData);
-        setTempdept('Civil Engineering');
-        setTempsem('Semester 1');
+        setTempdept('Civil');
+        setTempsem('2022');
       } else {
         setUserdata(cacheUserData);
         setTempdept(ctempdept);
@@ -110,10 +110,9 @@ export default function PageOne() {
     };
     loadCache();
 
-          setTimeout(() => {
-  BootSplash.hide({ fade: true });
-}, 200);
-    
+    setTimeout(() => {
+      BootSplash.hide({fade: true});
+    }, 200);
   }, []);
 
   useFocusEffect(
@@ -140,102 +139,92 @@ export default function PageOne() {
     reqType: userdata.mail,
     regType: tempreg,
     depType: tempdept,
-    semType: tempsem,
+    userType: userdata._id,
     access: userdata.roll,
   };
 
   return (
     <View
-    
       style={{
         backgroundColor: '#ffffffff',
         height: '100%',
         paddingHorizontal: 5,
       }}>
-        <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
+      <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
 
-<RBSheet
-  ref={refRBExit}
-  closeOnDragDown
-  closeOnPressMask
-  height={230}
-  customStyles={{
-    container: {
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      padding: 20,
-      alignItems: 'center',
-    },
-  }}
->
-  <HeaderLogo />
+      <RBSheet
+        ref={refRBExit}
+        closeOnDragDown
+        closeOnPressMask
+        height={230}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 20,
+            alignItems: 'center',
+          },
+        }}>
+        <HeaderLogo />
 
-  <Text
-    style={{
-      fontSize: 18,
-      color: 'black',
-      textAlign: 'center',
-      marginTop: 20,
-      fontFamily: 'Philosopher',
-    }}
-  >
-    Are you sure you want to exit?
-  </Text>
+        <Text
+          style={{
+            fontSize: 18,
+            color: 'black',
+            textAlign: 'center',
+            marginTop: 20,
+            fontFamily: 'Philosopher',
+          }}>
+          Are you sure you want to exit?
+        </Text>
 
-  <View
-    style={{
-      flexDirection: 'row',
-      marginTop: 30,
-      gap: 15,
-    }}
-  >
-    {/* Cancel Button */}
-    <TouchableOpacity
-      onPress={() => refRBExit.current.close()}
-      style={{
-        flex: 1,
-        backgroundColor: '#3EB489',
-        paddingVertical: 12,
-        borderRadius: 10,
-        alignItems: 'center',
-      }}
-    >
-      <Text
-        style={{
-          color: 'white',
-          fontSize: 18,
-          fontFamily: 'Philosopher',
-        }}
-      >
-        Cancel
-      </Text>
-    </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 30,
+            gap: 15,
+          }}>
+          {/* Cancel Button */}
+          <TouchableOpacity
+            onPress={() => refRBExit.current.close()}
+            style={{
+              flex: 1,
+              backgroundColor: '#3EB489',
+              paddingVertical: 12,
+              borderRadius: 10,
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 18,
+                fontFamily: 'Philosopher',
+              }}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
 
-    {/* Exit Button */}
-    <TouchableOpacity
-      onPress={() => BackHandler.exitApp()}
-      style={{
-        flex: 1,
-        backgroundColor: '#CD5C5C',
-        paddingVertical: 12,
-        borderRadius: 10,
-        alignItems: 'center',
-      }}
-    >
-      <Text
-        style={{
-          color: 'white',
-          fontSize: 18,
-          fontFamily: 'Philosopher',
-        }}
-      >
-        Exit
-      </Text>
-    </TouchableOpacity>
-  </View>
-</RBSheet>
-
-
+          {/* Exit Button */}
+          <TouchableOpacity
+            onPress={() => BackHandler.exitApp()}
+            style={{
+              flex: 1,
+              backgroundColor: '#CD5C5C',
+              paddingVertical: 12,
+              borderRadius: 10,
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 18,
+                fontFamily: 'Philosopher',
+              }}>
+              Exit
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
 
       {/* <Portal>
         <Dialog
@@ -273,25 +262,23 @@ export default function PageOne() {
       /> */}
 
       <RBSheet
-  ref={refSemesterSheet}
-  height={350}
-  openDuration={400}
-  closeOnDragDown={true}
-  customStyles={{
-    container: {
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-    },
-  }}
->
-  <SemesterDialog
-    onSelect={(sem) => {
-      handleSelect2(sem);
-      refSemesterSheet.current.close();
-    }}
-  />
-</RBSheet>
-
+        ref={refSemesterSheet}
+        height={350}
+        openDuration={400}
+        closeOnDragDown={true}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          },
+        }}>
+        <SemesterDialog
+          onSelect={sem => {
+            handleSelect2(sem);
+            refSemesterSheet.current.close();
+          }}
+        />
+      </RBSheet>
 
       {/* <SemesterDialog
         visible={visible2}
@@ -309,8 +296,7 @@ export default function PageOne() {
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
           },
-        }}
-      >
+        }}>
         <DepartmentDialog
           onSelect={handleSelect}
           onClose={() => refRBSheet.current.close()}
@@ -322,475 +308,357 @@ export default function PageOne() {
       <ScrollView
         style={{backgroundColor: '#FFFFFF'}}
         keyboardShouldPersistTaps="handled">
-        
-
         <StudentTitle />
 
-        <Animatable.View animation={'zoomIn'}
-      duration={1000} delay={300} useNativeDriver  style={{marginBottom: 10}} >
+        <View style={{marginLeft: 10}}>
+          <Text
+            style={{
+              color: '#808080',
+              marginLeft: 0,
+              fontFamily: 'Momo Trust Display',
+              fontSize: 14,
+              marginTop: 1,
+              marginBottom: 2,
+            }}>
+            Select Profile
+          </Text>
+        </View>
 
-<TouchableOpacity onPress={() => refRBSheet.current.open()}>
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#E6E6FA',
-      marginHorizontal: 5,
-      padding: 8,
-      borderRadius: 10,
-      alignSelf: 'flex-start',
-    }}
-  >
-  <FontAwesome name="bookmark" color="#4B0082" size={18} />
-    {/* <Icon source="playlist-edit" color="#856088" size={25} /> */}
-    <Text
-      style={{
-        color: '#4B0082',
-        marginLeft: 6,
-        fontSize: 15,
-        fontFamily: 'Philosopher',
-      }}
-    >
-      {tempdept}
-    </Text>
+        <Animatable.View
+          animation="zoomIn"
+          duration={1000}
+          delay={300}
+          useNativeDriver
+          style={{marginBottom: 10}}>
+          {/* ROW CONTAINER */}
+          <View style={{flexDirection: 'row', marginHorizontal: 5}}>
+            {/* DEPT – 80% */}
+            <TouchableOpacity
+              style={{flex: 0.6, marginRight: 6}}
+              onPress={() => refRBSheet.current.open()}
+              activeOpacity={0.6}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: '#E6E6FA',
+                  padding: 8,
+                  borderRadius: 10,
+                }}>
+                <FontAwesome name="bookmark" color="#4B0082" size={18} />
+                <Text
+                  style={{
+                    color: '#4B0082',
+                    marginLeft: 6,
+                    fontSize: 15,
+                    fontFamily: 'Philosopher',
+                  }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">
+                  Dept : {tempdept}
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-    
-  </View>
-</TouchableOpacity>
-
-
-          <TouchableOpacity onPress={() => refSemesterSheet.current.open()}>
-            <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#FFF0F5',
-      marginTop: 10,
-      marginHorizontal: 5,
-      padding: 8,
-      borderRadius: 10,
-      alignSelf: 'flex-start',
-    }}
-  ><FontAwesome name="grid" color="#DE3163" size={18} />
-            <Text
-              style={{
-                color: '#DE3163',
-                marginLeft: 6,
-                fontSize: 15,
-                fontFamily: 'Philosopher',
-              }}>
-                
-              {tempsem}
-            </Text></View>
-          </TouchableOpacity>
+            {/* REG – 20% */}
+            <TouchableOpacity
+              style={{flex: 0.4}}
+              onPress={() => refSemesterSheet.current.open()}
+              activeOpacity={0.8}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#E6E6FA',
+                  padding: 8,
+                  borderRadius: 10,
+                }}>
+                <FontAwesome name="grid" color="#4B0082" size={18} />
+                <Text
+                  style={{
+                    color: '#4B0082',
+                    marginLeft: 4,
+                    fontSize: 15,
+                    fontFamily: 'Philosopher',
+                  }}>
+                  Reg : {tempsem}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </Animatable.View>
 
         <Search />
 
-        {/* <Animatable.Text animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver  style={styles.subtitle}> Learning Resource </Animatable.Text> */}
+        <View style={{marginLeft: 10}}>
+          <Text
+            style={{
+              color: '#808080',
+              marginLeft: 0,
+              fontFamily: 'Momo Trust Display',
+              fontSize: 14,
+              marginTop: 10,
+            }}>
+            Academics
+          </Text>
+        </View>
 
-
-
-
-<Animatable.View
-  animation={'zoomIn'}
-  duration={1000}
-  delay={500}
-  useNativeDriver
-  style={{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 10,
-
-  }}
->
-
-  {/* BOX 1 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#E0FFFF',
-      borderRadius: 15,
-      paddingVertical: 10,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <MaterialCommunityIcons name="timetable" color="#007BA7" size={31} />
-    <Text style={{ color: '#007BA7', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
-      Time Table
-    </Text>
-  </TouchableOpacity>
-
-  {/* BOX 2 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#D0F0C0',
-      paddingVertical: 10,
-      borderRadius: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <MaterialCommunityIcons name="notebook-edit-outline" color="#2E8B57" size={31} />
-    <Text style={{ color: '#2E8B57', fontFamily: 'Philosopher', marginTop: 5, fontSize:15 }}>
-      Notes
-    </Text>
-  </TouchableOpacity>
-
-</Animatable.View>
-
-
-
-
-
-<Animatable.View
-  animation={'zoomIn'}
-  duration={1000}
-  delay={600}
-  useNativeDriver
-  style={{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 10,
-
-  }}
->
-
-  {/* BOX 1 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#EFDCFF',
-      paddingVertical: 10,
-      borderRadius: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-
-    onPress={() => {
-              if (!netc) {
-                navigation.navigate('SubShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-  >
-    <MaterialCommunityIcons name="clipboard-edit-outline" color="#6F2DA8" size={31} />
-    <Text style={{ color: '#6F2DA8', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
-      Sem Exam
-    </Text>
-  </TouchableOpacity>
-
-  {/* BOX 2 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#F7E7CE',
-      paddingVertical: 10,
-      borderRadius: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <MaterialCommunityIcons name="book-education-outline" color="#FF7F50" size={31} />
-    <Text style={{ color: '#FF7F50', fontFamily: 'Philosopher', marginTop: 5, fontSize:15 }}>
-      Syllabus
-    </Text>
-  </TouchableOpacity>
-
-</Animatable.View>
-
-
-
-
-
-<Animatable.View
-  animation={'zoomIn'}
-  duration={1000}
-  delay={700}
-  useNativeDriver
-  style={{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 10,
-
-  }}
->
-
-  {/* BOX 1 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#E5E4E2',
-      paddingVertical: 10,
-      borderRadius: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <MaterialCommunityIcons name="bookshelf" color="#4D5D53" size={31} />
-    <Text style={{ color: '#4D5D53', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
-      Books
-    </Text>
-  </TouchableOpacity>
-
-
-
-</Animatable.View>
-
-
-
-
-
-<Animatable.View
-  animation={'zoomIn'}
-  duration={1000}
-  delay={700}
-  useNativeDriver
-  style={{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 10,
-
-  }}
->
-
-  {/* BOX 1 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#F3EBF3',
-      paddingVertical: 10,
-      borderRadius: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <MaterialCommunityIcons name="clipboard-list-outline" color="#8d4b89ff" size={31} />
-    <Text style={{ color: '#8d4b89ff', fontFamily: 'Philosopher', marginTop: 5, fontSize:15  }}>
-      Unit Test 1
-    </Text>
-  </TouchableOpacity>
-
-  {/* BOX 2 */}
-  <TouchableOpacity
-    style={{
-      flex: 1,
-      marginHorizontal: 5,
-      backgroundColor: '#FFE2DE',
-      paddingVertical: 10,
-      borderRadius: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <MaterialCommunityIcons name="clipboard-list-outline" color="#8A3324" size={31} />
-    <Text style={{ color: '#8A3324', fontFamily: 'Philosopher', marginTop: 5, fontSize:15 }}>
-      Unit Test 2
-    </Text>
-  </TouchableOpacity>
-
-</Animatable.View>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{/* 
-        <Animatable.View style={styles.v1} animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver>
+        <Animatable.View
+          animation={'zoomIn'}
+          duration={1000}
+          delay={500}
+          useNativeDriver
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: 10,
+          }}>
+          {/* BOX 1 */}
           <TouchableOpacity
-            onPress={() => {
-              if (!netc) {
-                navigation.navigate('TimetableShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-            style={[styles.syltouch, {backgroundColor: '#E2FAFD'}]}>
-            <Logo width={'40%'} height={'100%'} />
-
-            <Text style={[styles.semst, {marginLeft: -15}]}>Time Table</Text>
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#E0FFFF',
+              borderRadius: 15,
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MaterialCommunityIcons
+              name="timetable"
+              color="#007BA7"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#007BA7',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Time Table
+            </Text>
           </TouchableOpacity>
 
-          
-
-          
-
-           <TouchableOpacity
-            onPress={() => {
-              if (!netc) {
-                navigation.navigate('StuNoteShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-            style={[styles.syltouch, {backgroundColor: '#F8FFF6'}]}>
-            <Note width={'40%'} height={'100%'} />
-
-            <Text style={[styles.semst, {marginLeft: -35}]}>Notes</Text>
-          </TouchableOpacity> 
-        </Animatable.View>
-
-        <Animatable.View style={styles.v1} animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver>
+          {/* BOX 2 */}
           <TouchableOpacity
-            onPress={() => {
-              if (!netc) {
-                navigation.navigate('SubShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-            style={[styles.syltouch, {backgroundColor: '#E7E8FF'}]}>
-            <Sem width={'40%'} height={'100%'} />
-
-            <Text style={styles.semst}> Sem Exam</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              if (!netc) {
-                navigation.navigate('SyllShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-            style={styles.syltouch}>
-            <Syl width={'40%'} height={'100%'} />
-
-            <Text style={[styles.semst, {marginLeft: -20}]}>Syllabus</Text>
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#D0F0C0',
+              paddingVertical: 10,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MaterialCommunityIcons
+              name="notebook-edit-outline"
+              color="#2E8B57"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#2E8B57',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Notes
+            </Text>
           </TouchableOpacity>
         </Animatable.View>
 
-        <Animatable.Text animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver style={styles.subtitle}> Study Materials </Animatable.Text>
-
-         <Animatable.View style={styles.stdview} animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver>
-        
-
+        <Animatable.View
+          animation={'zoomIn'}
+          duration={1000}
+          delay={600}
+          useNativeDriver
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: 10,
+          }}>
+          {/* BOX 1 */}
           <TouchableOpacity
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#EFDCFF',
+              paddingVertical: 10,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
             onPress={() => {
               if (!netc) {
-                navigation.navigate('BooksShow', somedata);
+                navigation.navigate('SubShow', {
+                  reqType: 'Semester Questions',
+                  regType: tempsem,
+                  depType: tempdept,
+                  userType: userdata._id,
+                  access: userdata.roll,
+                });
               } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
+                ToastAndroid.show(
+                  'No, Internet Connection',
+                  ToastAndroid.SHORT,
+                );
                 Vibration.vibrate(100);
               }
-            }}
-            style={[styles.ut2touch, {backgroundColor: '#FDE6D7'}]}>
-            <Books width={'50%'} height={'100%'} />
-
-            <Text style={styles.stdtxt}>Books</Text>
+            }}>
+            <MaterialCommunityIcons
+              name="clipboard-edit-outline"
+              color="#6F2DA8"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#6F2DA8',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Sem Exam
+            </Text>
           </TouchableOpacity>
 
+          {/* BOX 2 */}
           <TouchableOpacity
-            onPress={() => {
-              if (!netc) {
-                navigation.navigate('UtSubShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-            style={[styles.ut2touch, {backgroundColor: '#E2FAFD'}]}>
-            <Ut width={'50%'} height={'100%'} />
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#F7E7CE',
+              paddingVertical: 10,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MaterialCommunityIcons
+              name="book-education-outline"
+              color="#C04000"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#C04000',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Syllabus
+            </Text>
+          </TouchableOpacity>
+        </Animatable.View>
 
-            <Text style={styles.stdtxt}>Unit Test 1</Text>
+        <Animatable.View
+          animation={'zoomIn'}
+          duration={1000}
+          delay={700}
+          useNativeDriver
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: 10,
+          }}>
+          {/* BOX 1 */}
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#E5E4E2',
+              paddingVertical: 10,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MaterialCommunityIcons
+              name="bookshelf"
+              color="#4D5D53"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#4D5D53',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Books
+            </Text>
+          </TouchableOpacity>
+        </Animatable.View>
+
+        <Animatable.View
+          animation={'zoomIn'}
+          duration={1000}
+          delay={700}
+          useNativeDriver
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: 10,
+          }}>
+          {/* BOX 1 */}
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#F3EBF3',
+              paddingVertical: 10,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MaterialCommunityIcons
+              name="clipboard-list-outline"
+              color="#8d4b89ff"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#8d4b89ff',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Unit Test 1
+            </Text>
           </TouchableOpacity>
 
+          {/* BOX 2 */}
           <TouchableOpacity
-            onPress={() => {
-              if (!netc) {
-                navigation.navigate('UttSubShow', somedata);
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-            }}
-            style={styles.ut2touch}>
-            <Ut width={'50%'} height={'100%'} />
-            <Text style={styles.stdtxt}>Unit Test 2</Text>
+            style={{
+              flex: 1,
+              marginHorizontal: 5,
+              backgroundColor: '#FFE2DE',
+              paddingVertical: 10,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MaterialCommunityIcons
+              name="clipboard-list-outline"
+              color="#8A3324"
+              size={31}
+            />
+            <Text
+              style={{
+                color: '#8A3324',
+                fontFamily: 'Philosopher',
+                marginTop: 5,
+                fontSize: 15,
+              }}>
+              Unit Test 2
+            </Text>
           </TouchableOpacity>
         </Animatable.View>
 
        
-
-        <Animatable.Text animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver style={styles.subtitle}>Mess Food Menu</Animatable.Text>
-
-        <Animatable.View style={styles.v1} animation={'zoomIn'}
-      duration={1000} delay={1200} useNativeDriver>
-          <TouchableOpacity
-            style={[styles.syltouch, {backgroundColor: '#E2FAFD'}]}
-            onPress={() => {
-
-              if (!netc) {
-                navigation.navigate('WebViewShow', {
-                url: 'https://mygct.org/app/uploads/boyshostel.pdf',
-              });
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-              
-            }}>
-            <Food width={'40%'} height={'100%'} />
-
-            <Text style={styles.semst}>Boys</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.syltouch, {backgroundColor: '#E7E8FF'}]}
-            onPress={() => {
-
-              if (!netc) {
-                navigation.navigate('WebViewShow', {
-                url: 'https://mygct.org/app/uploads/girlshostel.pdf',
-              });
-              } else {
-                ToastAndroid.show('No, Internet Connection', ToastAndroid.SHORT);
-                Vibration.vibrate(100);
-              }
-
-              
-            }}>
-            <Food width={'40%'} height={'100%'} />
-            <Text style={[styles.semst, {marginLeft: -35}]}>Girls</Text>
-          </TouchableOpacity>
-        </Animatable.View> */}
       </ScrollView>
     </View>
   );
@@ -803,17 +671,17 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif-condensed',
     fontSize: 18,
     fontWeight: '700',
-   // marginTop: 15,
-   marginVertical:10
+    // marginTop: 15,
+    marginVertical: 10,
   },
   v1: {
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
-    justifyContent:"space-around",
+    justifyContent: 'space-around',
     marginTop: 10,
     height: 80,
-    marginBottom:10
+    marginBottom: 10,
   },
   ut2touch: {
     width: '30%',
@@ -845,7 +713,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     height: 100,
   },
   alutxt: {

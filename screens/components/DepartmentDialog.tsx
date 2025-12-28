@@ -8,15 +8,15 @@ import {
 } from 'react-native';
 
 const departments = [
-  'Civil Engineering',
-  'Computer Science Engineering',
-  'Electronics And Communication Engineering',
-  'Electrical And Electronics Engineering',
-  'Electronics And Instrumentation Engineering',
-  'Industrial Bio Technology',
-  'Information Technology',
-  'Mechanical Engineering',
-  'Production Engineering',
+  'Civil',
+  'CSE',
+  'ECE',
+  'EEE',
+  'EIE',
+  'IBT',
+  'IT',
+  'Mechanical',
+  'Production',
 ];
 
 function DepartmentDialog({onSelect, onClose}) {

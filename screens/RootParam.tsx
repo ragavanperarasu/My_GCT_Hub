@@ -1,7 +1,7 @@
 export type RootStackParamList = {
   StudentHome: undefined;
   StudentLogin:undefined;
-  SubShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
+  SubShow:{reqType : string, regType : string , depType : string, userType : string, access: string};
   BooksShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
   UtSubShow:{reqType : string, regType : string , depType : string, semType : string, access: string};
   UttSubShow:{reqType : string, regType : string , depType : string, semType : string, access: string};

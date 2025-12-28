@@ -1,5 +1,13 @@
 import React, {useEffect, useState, useLayoutEffect, useRef} from 'react';
-import {View, StyleSheet, ScrollView, TouchableOpacity, ToastAndroid, TextInput, Vibration} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ToastAndroid,
+  TextInput,
+  Vibration,
+} from 'react-native';
 import Nodejs from '../../assets/images/accoun.svg';
 import {Avatar, Card, Text, Button, Appbar, Snackbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -16,230 +24,153 @@ import Loading from '../components/Loading';
 
 import * as Animatable from 'react-native-animatable';
 
-import Feather from "react-native-vector-icons/Feather";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import RBSheet from 'react-native-raw-bottom-sheet';
+import Feather from 'react-native-vector-icons/Feather';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import AddSubjectSheet from '../components/AddSubjectSheet';
-
 
 const GETTING_POST = '/getpost';
 
 type SubShowScreenProp = StackNavigationProp<RootStackParamList, 'SubShow'>;
 
-const deptList = ['Civil','CSE', 'ECE', 'EEE','EIE','IBT', 'Mechanical', 'Production'];
-const regulationList = ['2019', '2022', '2023'];
-
-
 export default function SubShow({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
-  const {reqType, regType, depType, semType, access} = route.params;
-  const [data, setData] = useState([{'subname':'Tamil'},{'subname':'Probability, Random Process and Queueing Theory'},{'subname':'Theory of Computation'},{'subname':'Data Structure'},{'subname':'Java with Object Oriented Programming'},{'subname':'Network Security'}]);
+
+  const {reqType, regType, depType, userType, access} = route.params;
+  console.log(route.params);
+
+  const [data, setData] = useState([]);
 
   const [acc, setAcc] = useState(true);
 
   const [load, setLoad] = useState(false);
 
-  const [errtxt, setErrtxt] = useState('');
-  const [snvisible, setSnvisible] = useState(false);
-
-  const [expandedSubject, setExpandedSubject] = useState(null);
+  const [searchText, setSearchText] = useState('');
+  const [sortOrder, setSortOrder] = useState<'AZ' | 'ZA'>('AZ');
 
   const refRBSheet = useRef<RBSheet>(null);
-
-const [subjectName, setSubjectName] = useState('');
-const [selectedDepts, setSelectedDepts] = useState<string[]>([]);
-const [regulation, setRegulation] = useState('');
-
 
   useEffect(() => {
     if (access === 'Student') setAcc(true);
     else if (access === 'Admin') setAcc(true);
     else if (access === 'Root') setAcc(true);
-    //getData();
+    getData();
   }, []);
 
-
-
-  // Set header button here
-useLayoutEffect(() => {
-  navigation.setOptions({
-    headerRight: () => (
-      <TouchableOpacity
-        onPress={() => refRBSheet.current?.open()}
-        style={{ marginRight: 5 }}
-      >
-        <Feather name="plus" size={24} color="#1560BD" />
-      </TouchableOpacity>
-    ),
-  });
-}, [navigation]);
-
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: reqType,
+      headerTitleAlign: 'center',
+      headerTitleStyle: {
+        fontSize: 18,
+        color: '#1560BD',
+        fontFamily: 'Momo Trust Display',
+      },
+      headerTintColor: '#1560BD',
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => refRBSheet.current?.open()}
+          style={{marginRight: 5}}>
+          <Feather name="plus" size={24} color="#1560BD" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, reqType]);
 
   function getData() {
     setLoad(true);
     const fetchData = async () => {
-      const jsonData = {
-        dept: depType,
-        sem: semType,
-        reg: regType,
-      };
       try {
-        const url = API_URL + GETTING_POST;
-        await axios.post(url, jsonData).then(res => {
-          const resData = res.data.sub;
-          setData(resData);
+        const url =
+          'http://192.168.150.104:5000' +
+          `/app/subjects/sublist/${regType}/${depType}`;
+        await axios.get(url).then(res => {
+          const resData = res.data;
+          setData(resData.data);
         });
         setLoad(false);
       } catch (error) {
         setLoad(false);
-        setErrtxt('Network Problem');
-        setSnvisible(true);
       }
     };
     fetchData();
   }
 
-  function addNewSubject(){
+  function addNewSubject() {
     ToastAndroid.show('Something Issue', ToastAndroid.SHORT);
   }
-
 
   if (load) {
     return <Loading />;
   }
 
-//   const toggleDept = (dept: string) => {
-//   setSelectedDepts(prev =>
-//     prev.includes(dept)
-//       ? prev.filter(d => d !== dept)
-//       : [...prev, dept]
-//   );
-// };
-
-
-
-
-const handleAddSubject = (payload: {
-  subjectName: string;
-  departments: string[];
-  regulation: string;
-}) => {
-  console.log('New Subject:', payload);
-
-  // API call here if needed
-};
-
-
+  const filteredData = data
+    ?.filter(item =>
+      item.subname.toLowerCase().includes(searchText.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sortOrder === 'AZ') {
+        return a.subname.localeCompare(b.subname);
+      } else {
+        return b.subname.localeCompare(a.subname);
+      }
+    });
 
   return (
     <View style={{flex: 1, backgroundColor: '#ffffffff'}}>
+      <AddSubjectSheet ref={refRBSheet} onSubmit={getData} />
 
-      <AddSubjectSheet
-  ref={refRBSheet}
-  onSubmit={handleAddSubject}
-/>
-
-
-      {/* <RBSheet
-  ref={refRBSheet}
-  height={450}
-  openDuration={250}
-  customStyles={{
-    container: {
-      padding: 16,
-      borderTopLeftRadius: 16,
-      borderTopRightRadius: 16,
-    },
-  }}
->
-  <ScrollView>
-
-    <Text style={styles.label}>Subject Name</Text>
-    <TextInput
-      placeholder="Enter subject name"
-      value={subjectName}
-      onChangeText={setSubjectName}
-      style={styles.input}
-      
-    />
-
-    <Text style={styles.label}>Departments (Common)</Text>
-    {deptList.map(dept => (
-      <TouchableOpacity
-        key={dept}
-        style={styles.checkboxRow}
-        onPress={() => toggleDept(dept)}
-      >
-        <Feather
-          name={selectedDepts.includes(dept) ? 'check-square' : 'square'}
-          size={20}
-          color="#1560BD"
-        />
-        <Text style={styles.checkboxText}>{dept}</Text>
-      </TouchableOpacity>
-    ))}
-
-    <Text style={styles.label}>Regulation</Text>
-    {regulationList.map(reg => (
-      <TouchableOpacity
-        key={reg}
-        style={styles.radioRow}
-        onPress={() => setRegulation(reg)}
-      >
-        <Feather
-          name={regulation === reg ? 'radio' : 'circle'}
-          size={20}
-          color="#1560BD"
-        />
-        <Text style={styles.checkboxText}>{reg}</Text>
-      </TouchableOpacity>
-    ))}
-
-
-    <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-      <Text style={styles.submitText}>Submit</Text>
-    </TouchableOpacity>
-
-  </ScrollView>
-</RBSheet> */}
-
-
-<ScrollView showsVerticalScrollIndicator={false}>
-  {data?.map((i, outerIndex) => (
-    <Animatable.View
-      animation="zoomIn"
-      duration={800}
-      delay={outerIndex * 80}
-      useNativeDriver
-      key={outerIndex}
-      style={styles.outerContainer}
-    >
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={styles.subjectCard}
-        // onPress={() =>
-        //   navigation.navigate("SubjectDetails", { subject: i })
-        // }
-      >
-        {/* Left Icon */}
-        <View style={styles.leftIcon}>
-           <Feather name="book-open" color="#1560BD" size={22} />
+      <View style={styles.filterBar}>
+        {/* Search */}
+        <View style={styles.searchBox}>
+          <Feather name="search" size={18} color="#6B7280" />
+          <TextInput
+            placeholder="Search subject"
+            value={searchText}
+            onChangeText={setSearchText}
+            style={styles.searchInput}
+          />
         </View>
 
-        {/* Subject Name */}
-        <View style={styles.textContainer}>
-          <Text style={styles.subjectText}>{i.subname}</Text>
-          <Text style={styles.subText}>Tap to view post</Text>
-        </View>
+        {/* Sort Button */}
+        <TouchableOpacity
+          style={styles.sortBtn}
+          onPress={() => setSortOrder(prev => (prev === 'AZ' ? 'ZA' : 'AZ'))}>
+          <Feather
+            name={sortOrder === 'AZ' ? 'arrow-down' : 'arrow-up'}
+            size={18}
+            color="#1560BD"
+          />
+          <Text style={styles.sortText}>
+            {sortOrder === 'AZ' ? 'A–Z' : 'Z–A'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* Right Arrow */}
-        <Feather name="chevron-right" size={22} color="#9CA3AF" />
-      </TouchableOpacity>
-    </Animatable.View>
-  ))}
-</ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {filteredData?.map((i, outerIndex) => (
+          <Animatable.View
+            animation="zoomIn"
+            duration={800}
+            delay={outerIndex * 60}
+            useNativeDriver
+            key={outerIndex}
+            style={styles.outerContainer}>
+            <TouchableOpacity activeOpacity={0.8} style={styles.subjectCard}>
+              <View style={styles.leftIcon}>
+                <Feather name="book-open" color="#1560BD" size={22} />
+              </View>
 
+              <View style={styles.textContainer}>
+                <Text style={styles.subjectText}>{i.subname}</Text>
+                <Text style={styles.subText}>Tap to view post</Text>
+              </View>
+
+              <Feather name="chevron-right" size={22} color="#9CA3AF" />
+            </TouchableOpacity>
+          </Animatable.View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -251,23 +182,21 @@ const styles = StyleSheet.create({
   },
 
   subjectCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7ff',
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 14,
-    borderColor:'#000000ff',
-    borderWidth:0.5,
   },
 
   leftIcon: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "#E8F0FE",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#E8F0FE',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 14,
   },
 
@@ -278,12 +207,12 @@ const styles = StyleSheet.create({
   subjectText: {
     fontSize: 15,
     fontFamily: 'Momo Trust Display',
-    color: "#00A86B",
+    color: '#00A86B',
   },
 
   subText: {
     fontSize: 12,
-    color: "#6B7280",
+    color: '#6B7280',
     fontFamily: 'Philosopher',
     marginTop: 2,
   },
@@ -292,14 +221,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Momo Trust Display',
     marginTop: 15,
     marginBottom: 8,
-    color:'#1560BD'
+    color: '#1560BD',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
     padding: 10,
-    fontFamily:'Philosopher',
+    fontFamily: 'Philosopher',
   },
   checkboxRow: {
     flexDirection: 'row',
@@ -314,7 +243,7 @@ const styles = StyleSheet.create({
   checkboxText: {
     marginLeft: 10,
     fontSize: 15,
-    color:'black',
+    color: 'black',
     fontFamily: 'Philosopher',
   },
   submitBtn: {
@@ -329,5 +258,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     fontFamily: 'Philosopher',
+  },
+
+  // new css
+  filterBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+
+  searchBox: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    height: 40,
+  },
+
+  searchInput: {
+    flex: 1,
+    marginLeft: 6,
+    fontSize: 14,
+    fontFamily: 'Philosopher',
+  },
+
+  sortBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+    backgroundColor: '#E8F0FE',
+    paddingHorizontal: 10,
+    height: 40,
+    borderRadius: 10,
+  },
+
+  sortText: {
+    marginLeft: 4,
+    color: '#1560BD',
+    fontFamily: 'Philosopher',
+    fontSize: 14,
   },
 });

@@ -3,14 +3,8 @@ import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from "react-nati
 
 const SemesterDialog = ({ onSelect }) => {
   const semesters = [
-    "Semester 1",
-    "Semester 2",
-    "Semester 3",
-    "Semester 4",
-    "Semester 5",
-    "Semester 6",
-    "Semester 7",
-    "Semester 8",
+    "2022",
+    "2018-a",
   ];
 
   return (
@@ -22,7 +16,7 @@ const SemesterDialog = ({ onSelect }) => {
           <TouchableOpacity
             key={index}
             onPress={() => onSelect(sem)}   // same like semSelect
-            style={{ paddingVertical: 12 }}
+            style={styles.item}
           >
             <Text style={styles.itemText}>{sem}</Text>
           </TouchableOpacity>

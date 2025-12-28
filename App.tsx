@@ -147,17 +147,7 @@ useEffect(() => {
 
       <Stack.Screen name="Dir" component={Dir} options={{ headerShown: false }}/>
       <Stack.Screen name="StudentHome" component={StudentHome} options={{ headerShown: false }}/>
-      <Stack.Screen name="SubShow" component={SubShow}  options={({ navigation }) => ({
-    title: "Semester Questions",
-    headerTitleAlign: 'center',
-    headerTitleStyle: {
-      fontSize: 18,
-      color: '#1560BD',
-      fontFamily: 'Momo Trust Display',
-    },
-    headerBackTitleVisible: false,
-    headerTintColor: '#1560BD',
-  })}/>
+      <Stack.Screen name="SubShow" component={SubShow}/>
     <Stack.Screen name="PageOne" component={PageOne} options={{ headerShown: false }}/>
       <Stack.Screen name="BooksShow" component={BooksShow} options={{ headerShown: false }}/>
       <Stack.Screen name="About" component={About} options={{ headerShown: true }}/>
