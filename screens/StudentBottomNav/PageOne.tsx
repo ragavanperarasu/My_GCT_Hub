@@ -135,13 +135,6 @@ export default function PageOne() {
     await cache.set(ckey, cvalue);
   };
 
-  let somedata = {
-    reqType: userdata.mail,
-    regType: tempreg,
-    depType: tempdept,
-    userType: userdata._id,
-    access: userdata.roll,
-  };
 
   return (
     <View
@@ -226,40 +219,6 @@ export default function PageOne() {
         </View>
       </RBSheet>
 
-      {/* <Portal>
-        <Dialog
-          visible={exitVisible}
-          onDismiss={() => setExitVisible(false)}
-          style={{backgroundColor: '#ffffffff'}}>
-          <Dialog.Content>
-            <Text
-              variant="bodyMedium"
-              style={{color: 'black', fontSize: 17, marginTop: 10}}>
-              Are you sure you want to exit?
-            </Text>
-          </Dialog.Content>
-
-          <Dialog.Actions>
-            <Button textColor="#6F2DA8" onPress={() => setExitVisible(false)}>
-              Cancel
-            </Button>
-            <Button
-              textColor="#6F2DA8"
-              onPress={() => {
-                setExitVisible(false);
-                BackHandler.exitApp();
-              }}>
-              Exit
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal> */}
-
-      {/* <DepartmentDialog
-        visible={visible1}
-        onClose={handleClose}
-        onSelect={handleSelect}
-      /> */}
 
       <RBSheet
         ref={refSemesterSheet}
@@ -279,12 +238,6 @@ export default function PageOne() {
           }}
         />
       </RBSheet>
-
-      {/* <SemesterDialog
-        visible={visible2}
-        onDismiss={handleClose2}
-        semSelect={handleSelect2}
-      /> */}
 
       <RBSheet
         ref={refRBSheet}
@@ -341,14 +294,14 @@ export default function PageOne() {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  backgroundColor: '#E6E6FA',
+                  backgroundColor: '#e2efffff',
                   padding: 8,
                   borderRadius: 10,
                 }}>
-                <FontAwesome name="bookmark" color="#4B0082" size={18} />
+                <FontAwesome name="bookmark" color="#1560BD" size={18} />
                 <Text
                   style={{
-                    color: '#4B0082',
+                    color: '#1560BD',
                     marginLeft: 6,
                     fontSize: 15,
                     fontFamily: 'Philosopher',
@@ -370,14 +323,14 @@ export default function PageOne() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: '#E6E6FA',
+                  backgroundColor: '#e2efffff',
                   padding: 8,
                   borderRadius: 10,
                 }}>
-                <FontAwesome name="grid" color="#4B0082" size={18} />
+                <FontAwesome name="grid" color="#1560BD" size={18} />
                 <Text
                   style={{
-                    color: '#4B0082',
+                    color: '#1560BD',
                     marginLeft: 4,
                     fontSize: 15,
                     fontFamily: 'Philosopher',
@@ -413,7 +366,7 @@ export default function PageOne() {
             flexDirection: 'row',
             justifyContent: 'space-between',
             width: '100%',
-            marginTop: 10,
+           
           }}>
           {/* BOX 1 */}
           <TouchableOpacity
@@ -442,47 +395,63 @@ export default function PageOne() {
             </Text>
           </TouchableOpacity>
 
-          {/* BOX 2 */}
+                    {/* BOX 2 */}
           <TouchableOpacity
             style={{
               flex: 1,
               marginHorizontal: 5,
-              backgroundColor: '#D0F0C0',
+              backgroundColor: '#ffe9edff',
               paddingVertical: 10,
               borderRadius: 15,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
             <MaterialCommunityIcons
-              name="notebook-edit-outline"
-              color="#2E8B57"
+              name="book-education-outline"
+              color="#C21E56"
               size={31}
             />
             <Text
               style={{
-                color: '#2E8B57',
+                color: '#C21E56',
                 fontFamily: 'Philosopher',
                 marginTop: 5,
                 fontSize: 15,
               }}>
-              Notes
+              Syllabus
             </Text>
           </TouchableOpacity>
+
+
         </Animatable.View>
 
-        <Animatable.View
+
+                        <View style={{marginLeft: 10}}>
+          <Text
+            style={{
+              color: '#808080',
+              marginLeft: 0,
+              fontFamily: 'Momo Trust Display',
+              fontSize: 14,
+              marginTop: 10,
+            }}>
+            Question Bank
+          </Text>
+        </View>
+
+
+            <Animatable.View
           animation={'zoomIn'}
           duration={1000}
-          delay={600}
+          delay={700}
           useNativeDriver
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
             width: '100%',
-            marginTop: 10,
+    
           }}>
-          {/* BOX 1 */}
-          <TouchableOpacity
+                      <TouchableOpacity
             style={{
               flex: 1,
               marginHorizontal: 5,
@@ -525,35 +494,63 @@ export default function PageOne() {
             </Text>
           </TouchableOpacity>
 
-          {/* BOX 2 */}
-          <TouchableOpacity
+                    <TouchableOpacity
             style={{
               flex: 1,
               marginHorizontal: 5,
-              backgroundColor: '#F7E7CE',
+              backgroundColor: '#ffdfd9ff',
               paddingVertical: 10,
               borderRadius: 15,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
             <MaterialCommunityIcons
-              name="book-education-outline"
-              color="#C04000"
+              name="clipboard-list-outline"
+              color="#79443B"
               size={31}
             />
             <Text
               style={{
-                color: '#C04000',
+                color: '#79443B',
                 fontFamily: 'Philosopher',
                 marginTop: 5,
                 fontSize: 15,
               }}>
-              Syllabus
+              Unit Test
             </Text>
           </TouchableOpacity>
-        </Animatable.View>
+          </Animatable.View>
+
+
+
+                <View style={{marginLeft: 10}}>
+          <Text
+            style={{
+              color: '#808080',
+              marginLeft: 0,
+              fontFamily: 'Momo Trust Display',
+              fontSize: 14,
+              marginTop: 10,
+            }}>
+            Learning Materials
+          </Text>
+        </View>
 
         <Animatable.View
+          animation={'zoomIn'}
+          duration={1000}
+          delay={600}
+          useNativeDriver
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            
+          }}>
+          
+        </Animatable.View>
+
+                <Animatable.View
           animation={'zoomIn'}
           duration={1000}
           delay={700}
@@ -562,7 +559,6 @@ export default function PageOne() {
             flexDirection: 'row',
             justifyContent: 'space-between',
             width: '100%',
-            marginTop: 10,
           }}>
           {/* BOX 1 */}
           <TouchableOpacity
@@ -587,7 +583,7 @@ export default function PageOne() {
                 marginTop: 5,
                 fontSize: 15,
               }}>
-              Books
+              Reference Material
             </Text>
           </TouchableOpacity>
         </Animatable.View>
@@ -602,62 +598,35 @@ export default function PageOne() {
             justifyContent: 'space-between',
             width: '100%',
             marginTop: 10,
+            marginBottom:70
           }}>
           {/* BOX 1 */}
           <TouchableOpacity
             style={{
               flex: 1,
               marginHorizontal: 5,
-              backgroundColor: '#F3EBF3',
+              backgroundColor: '#D0F0C0',
               paddingVertical: 10,
               borderRadius: 15,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
             <MaterialCommunityIcons
-              name="clipboard-list-outline"
-              color="#8d4b89ff"
+              name="notebook-edit-outline"
+              color="#2E8B57"
               size={31}
             />
             <Text
               style={{
-                color: '#8d4b89ff',
+                color: '#2E8B57',
                 fontFamily: 'Philosopher',
                 marginTop: 5,
                 fontSize: 15,
               }}>
-              Unit Test 1
-            </Text>
-          </TouchableOpacity>
-
-          {/* BOX 2 */}
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              marginHorizontal: 5,
-              backgroundColor: '#FFE2DE',
-              paddingVertical: 10,
-              borderRadius: 15,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <MaterialCommunityIcons
-              name="clipboard-list-outline"
-              color="#8A3324"
-              size={31}
-            />
-            <Text
-              style={{
-                color: '#8A3324',
-                fontFamily: 'Philosopher',
-                marginTop: 5,
-                fontSize: 15,
-              }}>
-              Unit Test 2
+              Reference Notes
             </Text>
           </TouchableOpacity>
         </Animatable.View>
-
        
       </ScrollView>
     </View>

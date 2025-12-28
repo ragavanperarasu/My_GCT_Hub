@@ -205,7 +205,7 @@ export default function About() {
 
 
       <ScrollView style={styles.scroll}>
-        <View style={{alignItems: 'center', marginTop: 50}}>
+        <View style={{alignItems: 'center', marginTop: 20}}>
           <Image
             source={{uri: userdata.profile}}
             style={{height: 100, width: 100, borderRadius: 100}}
@@ -453,6 +453,7 @@ export default function About() {
             paddingHorizontal: 10,
             paddingVertical: 10,
             borderRadius: 15,
+            marginBottom:70
           }}>
           <TouchableOpacity
             style={{

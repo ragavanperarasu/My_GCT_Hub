@@ -14,7 +14,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {RootStackParamList} from './screens/RootParam';
 
 import PageOne from './screens/StudentBottomNav/PageOne';
-import StudentHome from './screens/StudentHome';
 import Dir from './screens/Dir';
 import SubShow from './screens/axiosScreen/SubShow';
 import About from './screens/About';
@@ -146,11 +145,21 @@ useEffect(() => {
       <Stack.Navigator initialRouteName="Dir" screenOptions={{animation:"slide_from_right"}}>
 
       <Stack.Screen name="Dir" component={Dir} options={{ headerShown: false }}/>
-      <Stack.Screen name="StudentHome" component={StudentHome} options={{ headerShown: false }}/>
       <Stack.Screen name="SubShow" component={SubShow}/>
     <Stack.Screen name="PageOne" component={PageOne} options={{ headerShown: false }}/>
       <Stack.Screen name="BooksShow" component={BooksShow} options={{ headerShown: false }}/>
-      <Stack.Screen name="About" component={About} options={{ headerShown: true }}/>
+      <Stack.Screen name="About" component={About} options={({ navigation }) => ({
+    title: "User Profile",
+    headerTitleAlign: 'center',
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#1560BD',
+      fontFamily: 'Momo Trust Display',
+    },
+    headerBackTitleVisible: false,
+    headerTintColor: '#1560BD',
+    
+  })}/>
       <Stack.Screen name="WebViewShow" component={WebViewShow} options={{ headerShown: false }}/>
       <Stack.Screen name="WebViewSave" component={WebViewSave} options={{ headerShown: false }}/>
       <Stack.Screen name="UtSubShow" component={UtSubShow} options={{ headerShown: false }}/>
@@ -181,16 +190,12 @@ useEffect(() => {
       <Stack.Screen name="UploadNotes" component={UploadNotes} options={{ headerShown: false }}/>
       <Stack.Screen name="UploadSyll" component={UploadSyll} options={{ headerShown: false }}/>
       <Stack.Screen name="UploadTtable" component={UploadTtable} options={{ headerShown: false }}/>
-
       <Stack.Screen name="Showcomments" component={Showcomments} options={{ headerShown: false }}/>
-
-
       <Stack.Screen name="Att" component={Att} options={{ headerShown: false }}/>
       <Stack.Screen name="Attcreate" component={Attcreate} options={{ headerShown: false }}/>
       <Stack.Screen name="Insertatt" component={Insertatt} options={{ headerShown: false }}/>
       <Stack.Screen name="Attview" component={Attview} options={{ headerShown: false }}/>
       <Stack.Screen name="Pinenter" component={Pinenter} options={{ headerShown: false }}/>
-
       <Stack.Screen name="CameraScreen" component={CameraScreen} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer></PaperProvider>

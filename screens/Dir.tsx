@@ -25,7 +25,7 @@ export default function Dir() {
         if (cacheUserData) {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'StudentHome' }],
+            routes: [{ name: 'PageOne' }],
           });
         } else {
           navigation.reset({

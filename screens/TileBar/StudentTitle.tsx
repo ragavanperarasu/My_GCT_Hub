@@ -7,6 +7,8 @@ import HeaderLogo from '../components/HeaderLogo';
 import styles from '../components/Style1';
 import * as Animatable from 'react-native-animatable';
 import Feather from "react-native-vector-icons/Feather";
+import About from '../About';
+import {useNavigation} from '@react-navigation/native';
 
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -18,6 +20,7 @@ const cache = new Cache({
 });
 
 function StudentTitle() {
+  const navigation = useNavigation();
   const [userdata, setUserdata] = React.useState({});
   const refRBSheet = useRef();
 const bgAnim = useRef(new Animated.Value(0)).current;
@@ -35,12 +38,12 @@ const bgAnim = useRef(new Animated.Value(0)).current;
         Animated.timing(bgAnim, {
           toValue: 2,
           duration: 3000,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.timing(bgAnim, {
           toValue: 0,
           duration: 3000,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ])
     ).start();
@@ -142,7 +145,7 @@ const backgroundColor = bgAnim.interpolate({
 
 
 <TouchableOpacity
-  onPress={() => console.log("Pressed")}
+  onPress={() => {refRBSheet?.current?.close(); navigation.navigate('About')}}
   activeOpacity={0.8}
   style={{
     flexDirection: 'row',
@@ -169,7 +172,7 @@ const backgroundColor = bgAnim.interpolate({
       fontWeight: '600',
     }}
   >
-    Account Profile Settings
+    User Profile Settings
   </Text>
 </TouchableOpacity>
 
