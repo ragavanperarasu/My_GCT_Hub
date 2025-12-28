@@ -86,7 +86,7 @@ export default function UserLogin() {
             }
             sendLocalNotification(namef);
             setLoad(false);
-            navigation.navigate('StudentHome');
+            navigation.navigate('PageOne');
           } else {
             ToastAndroid.show('Something Issue', ToastAndroid.SHORT);
             Vibration.vibrate(100);
@@ -164,7 +164,6 @@ export default function UserLogin() {
         setLoad(false);
         return;
       }
-      setLoad(false);
       loginBackend(userInfo.data?.user);
       return {
         user: userInfo,

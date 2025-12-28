@@ -25,9 +25,11 @@ import Loading from '../components/Loading';
 import * as Animatable from 'react-native-animatable';
 
 import Feather from 'react-native-vector-icons/Feather';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import LottieView from 'lottie-react-native';
 
 import AddSubjectSheet from '../components/AddSubjectSheet';
+
+import cat from '../../assets/animations/cat.json'
 
 const GETTING_POST = '/getpost';
 
@@ -117,38 +119,58 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
     });
 
   return (
-    <View style={{flex: 1, backgroundColor: '#ffffffff'}}>
-      <AddSubjectSheet ref={refRBSheet} onSubmit={getData} />
+  <View style={{ flex: 1, backgroundColor: '#ffffffff' }}>
+    <AddSubjectSheet ref={refRBSheet} onSubmit={getData} />
 
-      <View style={styles.filterBar}>
-        {/* Search */}
-        <View style={styles.searchBox}>
-          <Feather name="search" size={18} color="#6B7280" />
-          <TextInput
-            placeholder="Search subject"
-            value={searchText}
-            onChangeText={setSearchText}
-            style={styles.searchInput}
-          />
-        </View>
-
-        {/* Sort Button */}
-        <TouchableOpacity
-          style={styles.sortBtn}
-          onPress={() => setSortOrder(prev => (prev === 'AZ' ? 'ZA' : 'AZ'))}>
-          <Feather
-            name={sortOrder === 'AZ' ? 'arrow-down' : 'arrow-up'}
-            size={18}
-            color="#1560BD"
-          />
-          <Text style={styles.sortText}>
-            {sortOrder === 'AZ' ? 'A–Z' : 'Z–A'}
-          </Text>
-        </TouchableOpacity>
+    <View style={styles.filterBar}>
+      {/* Search */}
+      <View style={styles.searchBox}>
+        <Feather name="search" size={18} color="#6B7280" />
+        <TextInput
+          placeholder="Search subject"
+          value={searchText}
+          onChangeText={setSearchText}
+          style={styles.searchInput}
+        />
       </View>
 
+      {/* Sort Button */}
+      <TouchableOpacity
+        style={styles.sortBtn}
+        onPress={() =>
+          setSortOrder(prev => (prev === 'AZ' ? 'ZA' : 'AZ'))
+        }>
+        <Feather
+          name={sortOrder === 'AZ' ? 'arrow-down' : 'arrow-up'}
+          size={18}
+          color="#1560BD"
+        />
+        <Text style={styles.sortText}>
+          {sortOrder === 'AZ' ? 'A–Z' : 'Z–A'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+
+    {/* ✅ Empty State */}
+    {filteredData?.length === 0 ? (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <LottieView
+        source={cat}
+        autoPlay
+        loop
+        style={{
+          width: '100%',
+          height: 200,
+          alignSelf: 'center',
+        }}
+      />
+      <Text style={{ marginTop: 10, color: '#1560BD', fontFamily:'Momo Trust Display', fontSize:17}}>
+  Data Not Available
+</Text>
+      </View>
+    ) : (
       <ScrollView showsVerticalScrollIndicator={false}>
-        {filteredData?.map((i, outerIndex) => (
+        {filteredData.map((i, outerIndex) => (
           <Animatable.View
             animation="zoomIn"
             duration={800}
@@ -171,8 +193,10 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
           </Animatable.View>
         ))}
       </ScrollView>
-    </View>
-  );
+    )}
+  </View>
+);
+
 }
 
 const styles = StyleSheet.create({

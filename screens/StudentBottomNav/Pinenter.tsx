@@ -103,12 +103,12 @@ export default function Pinenter({route}: {route: SubShowScreenProp}) {
           }}>
           Access PIN
         </Text>
-        <LottieView
+        {/* <LottieView
           style={{width: '100%', height: 300}}
           source={require('../../assets/animations/d.json')}
           autoPlay
           loop
-        />
+        /> */}
      
 
 

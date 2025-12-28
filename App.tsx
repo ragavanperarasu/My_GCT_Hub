@@ -21,12 +21,11 @@ import WebViewShow from './screens/axiosScreen/WebViewShow';
 import WebViewSave from './screens/axiosScreen/WebViewSave';
 import UtSubShow from './screens/axiosScreen/UtSubShow';
 import UttSubShow from './screens/axiosScreen/UttSubShow';
-import StuNoteShow from './screens/axiosScreen/StuNoteShow';
+import PostShow from './screens/axiosScreen/PostShow';
 import TimetableShow from './screens/axiosScreen/TimetableShow';
 import SyllShow from './screens/axiosScreen/SyllShow';
 import Search from './screens/Search';
 import UserLogin from './screens/UserLogin';
-import CreateNewAccount from './screens/CreateNewAccount';
 
 import UploadSemqus from './screens/axiosScreen/UploadSemqus';
 import UploadUtoqus from './screens/axiosScreen/UploadUtoqus';
@@ -164,13 +163,12 @@ useEffect(() => {
       <Stack.Screen name="WebViewSave" component={WebViewSave} options={{ headerShown: false }}/>
       <Stack.Screen name="UtSubShow" component={UtSubShow} options={{ headerShown: false }}/>
       <Stack.Screen name="UttSubShow" component={UttSubShow} options={{ headerShown: false }}/>
-      <Stack.Screen name="StuNoteShow" component={StuNoteShow} options={{ headerShown: false }}/>
+      <Stack.Screen name="PostShow" component={PostShow} options={{ headerShown: false }}/>
 
       <Stack.Screen name="TimetableShow" component={TimetableShow} options={{ headerShown: false }}/>
       <Stack.Screen name="SyllShow" component={SyllShow} options={{ headerShown: false }}/>
       <Stack.Screen name="Search" component={Search} options={{ headerShown: false }}/>
       <Stack.Screen name="UserLogin" component={UserLogin} options={{ headerShown: false }}/>
-      <Stack.Screen name="CreateNewAccount" component={CreateNewAccount} options={{ headerShown: false }}/>
 
       <Stack.Screen name="UploadSemqus" component={UploadSemqus} options={({ navigation }) => ({
     title: "New Post",
