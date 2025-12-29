@@ -9,6 +9,8 @@ import {
   Image,
   Button,
   Alert,
+  ToastAndroid,
+  Vibration,
   TextInput,
 } from 'react-native';
 import {Text, Snackbar, Surface, Icon} from 'react-native-paper';
@@ -28,9 +30,9 @@ import notifee, {
   AndroidImportance,
   AuthorizationStatus,
 } from '@notifee/react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-import Loading from '../components/Loading';
+import Uploading from '../components/Uploading';
 
 const cache = new Cache({
   namespace: 'mygct',
@@ -41,10 +43,7 @@ const cache = new Cache({
   backend: AsyncStorage,
 });
 
-type SubShowScreenProp = StackNavigationProp<
-  RootStackParamList,
-  'NewPost'
->;
+type SubShowScreenProp = StackNavigationProp<RootStackParamList, 'NewPost'>;
 
 export default function NewPost({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
@@ -54,20 +53,14 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
   const [tempdept, setTempdept] = useState('');
   const [tempsem, setTempSem] = useState('');
 
-  const [pname, setPname] = useState('');
-
   const [pdfFile, setPdfFile] = useState<any>(null);
 
-  const [load, setLoad] = useState(false);
-  const [loadtext, setLoadtext] = useState('Connecting to server');
-
-  const [errtxt, setErrtxt] = useState('');
-  const [snvisible, setSnvisible] = useState(false);
+  const [isupload, setIsupload] = useState(false);
+  const [loadtext, setLoadtext] = useState('');
 
   const [netc, setNetc] = useState(false);
 
   const [text, setText] = useState('');
-  const [height, setHeight] = useState(40);
 
   function netStatusCheck() {
     NetInfo.fetch().then(state => {
@@ -91,8 +84,8 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
     fetchData();
   }, []);
 
-  if (load) {
-    return <Loading  />;
+  if (isupload) {
+    return <Uploading progress={loadtext} />;
   }
 
   const handlePickDocument = async () => {
@@ -102,7 +95,7 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
       });
 
       setPdfFile(res);
-      console.log("Selected PDF file:", res);
+      console.log('Selected PDF file:', res);
     } catch (err) {}
   };
 
@@ -126,15 +119,16 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
 
   const handleUpload = async () => {
     if (!text || !pdfFile) {
-      setErrtxt('Please Select All Field');
-      setSnvisible(true);
+      ToastAndroid.show('Complete all fields', ToastAndroid.SHORT);
+      Vibration.vibrate(100);
       return;
     }
-    console.log('handle click')
-
-    // setLoadtext('Uploading File... Please wait');
-    // setLoad(true);
-
+    if (netc === true) {
+      ToastAndroid.show('No Internet Connection', ToastAndroid.SHORT);
+      Vibration.vibrate(100);
+      return;
+    }
+    setIsupload(true);
     const formData = new FormData();
     formData.append('subuid', subid);
     formData.append('useruid', userid);
@@ -146,46 +140,33 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
       name: pdfFile.name,
     });
 
-    console.log(formData)
-
-
-
     try {
-        const url = "http://192.168.150.104:5000/app/posts/semqus/newpost";
+      const url = 'http://192.168.150.104:5000/app/posts/semqus/newpost';
 
-const response = await axios.post(url, formData, {
-  headers: {
-    'Content-Type': 'multipart/form-data',
-  },
-  onUploadProgress: progressEvent => {
-    const percentCompleted = Math.round(
-      (progressEvent.loaded * 100) / progressEvent.total
-    );
-    setLoadtext(`Uploading... ${percentCompleted}%`);
-  },
-});
-
-
-    
-    
-    }
-
-
-    catch (error) {
-       console.error(error);
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: progressEvent => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
+          setLoadtext(`Uploading ${percentCompleted}%`);
+        },
+      });
+    } catch (error) {
       // setLoadtext('Upload failed');
       // setTimeout(() => {
       //   setLoad(false);
       //   navigation.navigate('StudentHome');
       // }, 500);
+    } finally {
+      setIsupload(false);
     }
   };
 
-  console.log("post screen : ",subname, pdfuri);
-
   return (
-   
-      <View style={{flex: 1, backgroundColor: 'white'}}>
+    <View style={{flex: 1, backgroundColor: 'white'}}>
       <View
         style={{
           paddingHorizontal: 10,
@@ -236,7 +217,12 @@ const response = await axios.post(url, formData, {
           }}>
           <FontAwesome6 name="file-pdf" size={20} color="#00693E" />
           <Text
-            style={{color: '#00693E', fontSize: 15, fontFamily: 'Philosopher', marginLeft: 5}}>
+            style={{
+              color: '#00693E',
+              fontSize: 15,
+              fontFamily: 'Philosopher',
+              marginLeft: 5,
+            }}>
             {pdfFile.name}
           </Text>
         </TouchableOpacity>
@@ -246,7 +232,7 @@ const response = await axios.post(url, formData, {
         <TextInput
           value={text}
           onChangeText={setText}
-          placeholder="Type you description"
+          placeholder="Type your title or description"
           multiline
           style={{
             minHeight: 100,
@@ -262,7 +248,7 @@ const response = await axios.post(url, formData, {
       <View
         style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: 50,
           left: 0,
           right: 0,
           backgroundColor: 'white',
@@ -274,7 +260,9 @@ const response = await axios.post(url, formData, {
         }}>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
-            onPress={() => navigation.replace('CameraScreen', {subname: subname, pdfuri: ''})}
+            onPress={() =>
+              navigation.replace('CameraScreen', {subname: subname, pdfuri: ''})
+            }
             style={{
               backgroundColor: '#FF9966',
               padding: 12,
@@ -314,9 +302,8 @@ const response = await axios.post(url, formData, {
             Post
           </Text>
         </TouchableOpacity>
-      </View></View>
-
-   
+      </View>
+    </View>
   );
 }
 
