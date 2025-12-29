@@ -48,7 +48,7 @@ type SubShowScreenProp = StackNavigationProp<
 
 export default function NewPost({route}: {route: SubShowScreenProp}) {
   const navigation = useNavigation<SubShowScreenProp>();
-  const {subname, pdfuri} = route.params;
+  const {reqType, userid, subid, subname, pdfuri} = route.params;
 
   const [userdata, setUserdata] = useState({});
   const [tempdept, setTempdept] = useState('');
@@ -125,23 +125,20 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
   }
 
   const handleUpload = async () => {
-    if (!pname || !pdfFile) {
+    if (!text || !pdfFile) {
       setErrtxt('Please Select All Field');
       setSnvisible(true);
       return;
     }
+    console.log('handle click')
 
-    setLoadtext('Uploading File... Please wait');
-    setLoad(true);
+    // setLoadtext('Uploading File... Please wait');
+    // setLoad(true);
 
     const formData = new FormData();
-    formData.append('docname', pdfFile.name);
-    formData.append('postby', userdata.name);
-    formData.append('postmail', userdata.mail);
-    formData.append('department', tempdept);
-    formData.append('postname', pname);
-    formData.append('sem', tempsem);
-    formData.append('subject', subname);
+    formData.append('subuid', subid);
+    formData.append('useruid', userid);
+    formData.append('postdes', text);
 
     formData.append('pdf', {
       uri: pdfFile.uri,
@@ -149,34 +146,38 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
       name: pdfFile.name,
     });
 
+    console.log(formData)
+
+
+
     try {
-      const url = API_URL + '/semupl22';
+        const url = "http://192.168.150.104:5000/app/posts/semqus/newpost";
 
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: progressEvent => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total,
-          );
-          setLoadtext(`Uploading... ${percentCompleted}%`);
-        },
-      });
+const response = await axios.post(url, formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+  onUploadProgress: progressEvent => {
+    const percentCompleted = Math.round(
+      (progressEvent.loaded * 100) / progressEvent.total
+    );
+    setLoadtext(`Uploading... ${percentCompleted}%`);
+  },
+});
 
-      setLoadtext('Upload successful!');
-      setTimeout(() => {
-        setLoad(false);
-        sendLocalNotification();
-        navigation.navigate('StudentHome');
-      }, 500);
-    } catch (error) {
-      console.error(error);
-      setLoadtext('Upload failed');
-      setTimeout(() => {
-        setLoad(false);
-        navigation.navigate('StudentHome');
-      }, 500);
+
+    
+    
+    }
+
+
+    catch (error) {
+       console.error(error);
+      // setLoadtext('Upload failed');
+      // setTimeout(() => {
+      //   setLoad(false);
+      //   navigation.navigate('StudentHome');
+      // }, 500);
     }
   };
 
@@ -296,7 +297,7 @@ export default function NewPost({route}: {route: SubShowScreenProp}) {
 
         {/* Post Button */}
         <TouchableOpacity
-          onPress={() => Alert.alert('Post')}
+          onPress={handleUpload}
           style={{
             backgroundColor: '#1560BD',
             paddingVertical: 10,
