@@ -31,7 +31,7 @@ export default function PostShow({route}:{route: PostShowScreenProp}) {
   const [load, setLoad] = useState(false);
 
         useEffect(() => {
-        getData();
+        //getData();
       }, []);
 
     useLayoutEffect(() => {
@@ -242,8 +242,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 10,
-    paddingTop: 5,
+    paddingTop: 10,
     paddingBottom: 1,
+    backgroundColor:'#e9e9e9ff'
   },
 
   userLeft: {
@@ -290,9 +291,10 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 10,
-    borderBottomWidth: 4,
-    borderColor: '#C0C0C0',
+    paddingVertical: 8,
+    //borderBottomWidth: 4,
+    backgroundColor: '#e9e9e9ff',
+    //borderColor: '#C0C0C0',
   },
 
   statItem: {
