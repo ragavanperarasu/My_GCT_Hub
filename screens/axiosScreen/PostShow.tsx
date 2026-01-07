@@ -12,6 +12,8 @@ import Loading from '../components/Loading';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
+import cat from '../../assets/animations/cat.json'
+import LottieView from 'lottie-react-native';
 
 const GETTING_POST = "/getpost"
 
@@ -31,7 +33,7 @@ export default function PostShow({route}:{route: PostShowScreenProp}) {
   const [load, setLoad] = useState(false);
 
         useEffect(() => {
-        //getData();
+        getData();
       }, []);
 
     useLayoutEffect(() => {
@@ -111,6 +113,24 @@ const onSharePdf = async (item) => {
 
 return (
   <View style={styles.container}>
+
+        {data?.length === 0 ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <LottieView
+            source={cat}
+            autoPlay
+            loop
+            style={{
+              width: '100%',
+              height: 200,
+              alignSelf: 'center',
+            }}
+          />
+          <Text style={{ marginTop: 10, color: '#1560BD', fontFamily:'Momo Trust Display', fontSize:17}}>
+      Post the resource if available
+    </Text>
+          </View>
+        ) : (
     <ScrollView showsVerticalScrollIndicator={false}>
       {data.map((item, index) => (
         <View key={index} style={styles.card}>
@@ -207,7 +227,7 @@ return (
           </View>
         </View>
       ))}
-    </ScrollView>
+    </ScrollView>)}
   </View>
 );
 

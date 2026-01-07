@@ -164,7 +164,7 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
         }}
       />
       <Text style={{ marginTop: 10, color: '#1560BD', fontFamily:'Momo Trust Display', fontSize:17}}>
-  Data Not Available
+  Post the resource if available
 </Text>
       </View>
     ) : (
