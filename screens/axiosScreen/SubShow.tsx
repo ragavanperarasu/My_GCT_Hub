@@ -83,7 +83,7 @@ export default function SubShow({route}: {route: SubShowScreenProp}) {
     const fetchData = async () => {
       try {
         const url =
-          'http://192.168.150.104:5000' +
+          'http://192.168.150.100:5000' +
           `/app/subjects/sublist/${regType}/${depType}`;
         await axios.get(url).then(res => {
           const resData = res.data;

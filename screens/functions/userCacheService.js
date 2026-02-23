@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Cache} from 'react-native-cache';
 
-const BASE_URL = "http://192.168.150.104:5000";
+const BASE_URL = "http://192.168.150.100:5000";
 
 
 const cache = new Cache({

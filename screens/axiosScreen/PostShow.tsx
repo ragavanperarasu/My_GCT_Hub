@@ -65,7 +65,7 @@ export default function PostShow({route}:{route: PostShowScreenProp}) {
     const fetchData = async () => {
       try {
         const url =
-          'http://192.168.150.104:5000' +`/app/posts/semqus/${subid}`;
+          'http://192.168.150.100:5000' +`/app/posts/semqus/${subid}`;
         await axios.get(url).then(res => {
           const resData = res.data;
           console.log("output : ",resData)
